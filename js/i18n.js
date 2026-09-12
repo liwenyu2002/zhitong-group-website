@@ -172,8 +172,12 @@
       if (en !== undefined) el.innerHTML = en;
     });
     document.documentElement.lang = cur === "en" ? "en" : "zh-CN";
-    document.querySelectorAll(".lang-switch b").forEach(b =>
-      b.classList.toggle("on", b.dataset.lang === cur));
+    const btn = document.querySelector(".lang-toggle");
+    if (btn) {
+      // 按钮显示的是「将要切换到」的语言
+      btn.textContent = cur === "zh" ? "EN" : "中";
+      btn.title = cur === "zh" ? "Switch to English" : "切换到中文";
+    }
   }
 
   function setLang(cur) {
@@ -183,15 +187,14 @@
   }
 
   function boot() {
-    // 导航加切换器
+    // 导航加通用风格切换按钮：点击在中 / EN 间切换
     const nav = document.querySelector(".topnav");
-    if (nav && !nav.querySelector(".lang-switch")) {
-      const sw = document.createElement("span");
-      sw.className = "lang-switch";
-      sw.innerHTML = '<b data-lang="zh">中</b><i>/</i><b data-lang="en">EN</b>';
-      nav.insertBefore(sw, nav.querySelector(".nav-cta"));
-      sw.querySelectorAll("b").forEach(b =>
-        b.addEventListener("click", () => setLang(b.dataset.lang)));
+    if (nav && !nav.querySelector(".lang-toggle")) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "lang-toggle";
+      btn.addEventListener("click", () => setLang(lang === "zh" ? "en" : "zh"));
+      nav.insertBefore(btn, nav.querySelector(".nav-cta"));
     }
     apply(lang);
   }

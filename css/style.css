@@ -1147,23 +1147,17 @@ html, body {
 /* 导航当前页高亮 */
 .topnav a.nav-on { border-color: var(--red); color: var(--red); }
 
-/* 中 / EN 切换 */
-.lang-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+/* 中 / EN 切换按钮（与导航按钮同风格） */
+.lang-toggle {
+  align-self: center;
+  padding: 7px 12px;
   font-family: var(--mono);
   font-size: 12px;
-  margin-right: 2px;
-}
-.lang-switch i { color: var(--ink-3); font-style: normal; }
-.lang-switch b {
-  font-weight: 400;
+  letter-spacing: 1px;
+  color: var(--ink);
+  background: rgba(247, 244, 234, 0.92);
+  border: 1.5px solid var(--ink);
   cursor: pointer;
-  color: var(--ink-2);
-  padding: 2px 4px;
-  border-bottom: 2px solid transparent;
-  transition: color 0.25s, border-color 0.25s;
+  transition: background 0.25s, color 0.25s;
 }
-.lang-switch b:hover { color: var(--ink); }
-.lang-switch b.on { color: var(--red); border-bottom-color: var(--red); }
+.lang-toggle:hover { background: var(--ink); color: #f2ecd9; }
