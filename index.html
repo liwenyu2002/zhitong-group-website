@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zhang Lab · 脑机接口课题组 · 北京中关村学院</title>
+<meta name="description" content="Zhang Lab —— 张致同课题组的脑机接口研究：神经电极、可穿戴传感、脑电解码与脑机大模型。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23171717'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%237dff9a' font-family='monospace'>&gt;_</text></svg>">
+<link rel="stylesheet" href="css/style.css?v=34">
+</head>
+<body>
+
+<!-- 背景：点阵大脑（随换页显现） -->
+<canvas id="bgBrain" aria-hidden="true"></canvas>
+
+<div id="grain" aria-hidden="true"></div>
+
+<nav class="topnav" aria-label="站点导航">
+  <a href="#hero" data-goto="hero">首页</a><a href="#group" data-goto="group">课题组</a><a href="#pi" data-goto="pi">PI</a><a href="#research" data-goto="research">研究</a><a href="#publications" data-goto="publications">论文</a><a class="nav-cta" href="#join" data-goto="join">加入我们</a>
+</nav>
+
+<!-- ============ 页面轨道：点导航栏左右换页 ============ -->
+<main id="deck" aria-live="polite">
+
+  <!-- 首屏 -->
+  <section class="slide slide-hero" id="hero">
+    <div class="stage-center" id="stageCenter">
+      <p class="eyebrow">北京中关村学院 · 张致同课题组</p>
+      <h1 class="lab-title">Zhang <em>Lab</em></h1>
+      <p class="hero-sub">NeuroDiagAI —— 神经精神疾病 EEG 辅助诊断：<br>128 通道超高密度无线脑电 · 自建 1.6w 条运动想象数据集 · 脑基础模型。人体的一切，都是信号。</p>
+      <div class="hero-actions">
+        <a class="btn-crt" href="#research" data-goto="research">查看研究方向 →</a>
+        <a class="btn-wire" href="#join" data-goto="join">加入我们</a>
+      </div>
+      <p class="deck-hint">点击顶部导航换页</p>
+    </div>
+
+    <div class="device-stack booting" id="deviceStack" aria-hidden="true">
+      <div class="dev desktop">
+        <div class="desktop-stand">
+          <span class="desktop-neck"></span>
+          <span class="desktop-base"></span>
+        </div>
+        <div class="desktop-shell">
+          <div class="crt-screen">
+            <canvas id="cvHyper"></canvas>
+            <div class="boot boot-desktop"><pre class="bios"></pre></div>
+          </div>
+        </div>
+      </div>
+      <div class="dev phone">
+        <span class="phone-notch"></span>
+        <div class="crt-screen emo-screen">
+          <span class="emo-face" id="emoFace">(^_^)</span>
+          <div class="boot boot-phone"><span class="boot-ring"></span></div>
+        </div>
+      </div>
+      <div class="dev laptop">
+        <div class="laptop-lid">
+          <div class="crt-screen plot">
+            <canvas id="cvPatch"></canvas>
+            <div class="boot boot-laptop"><span class="boot-bar"><i></i></span></div>
+          </div>
+        </div>
+        <div class="laptop-deck"><i class="kb"></i><i class="tp"></i><i class="dev-led"></i></div>
+      </div>
+      <div class="dev watch">
+        <i class="strap st-top"></i>
+        <div class="watch-body">
+          <div class="crt-screen">
+            <canvas id="cvPulse"></canvas>
+            <div class="boot boot-watch"><span class="boot-bar sm"><i></i></span></div>
+          </div>
+        </div>
+        <i class="strap st-bottom"></i>
+      </div>
+    </div>
+  </section>
+
+  <!-- 课题组（含图版一） -->
+  <section class="slide" id="group">
+    <section class="chapter">
+      <div class="sec-head" data-reveal>
+        <span class="sec-no">01</span>
+        <span class="sec-label">GROUP · 课题组</span>
+      </div>
+      <h2 class="sec-title" data-reveal>从材料到智能，<br>做<mark>全链条</mark>的脑机接口研究。</h2>
+      <p class="lead" data-reveal>Zhang Lab 是一支年轻的脑机接口研究团队，研究贯穿「材料 — 器件 — 系统 — 智能」全链条：高性能导电聚合物神经电极、可变刚度柔性植入电极、可穿戴传感系统，到脑电信号解码与脑机大模型。我们相信，精巧的工程能让思想被聆听。</p>
+
+      <div class="news" data-reveal>
+        <div class="news-head">NEWS<em>动态</em></div>
+        <ul>
+          <li><span class="n-date">2026.09</span><p>NeuroDiagAI 2026Q3：IEDM 2026 录取实现学院首次；自研 128 通道超高密度无线脑电系统搭建完成</p></li>
+          <li><span class="n-date">2026.08</span><p>双通道眼电实时交互：6 分类 · 跨佩戴 81.7% · CPU 1.2ms/跳（ICLR 2027 在投）</p></li>
+          <li><span class="n-date">2026.08</span><p>第四届中国脑机接口大赛获 2 项二等奖；自建 1.6w 条运动想象 EEG 数据集（42 名被试 · 7 种运动）</p></li>
+          <li><span class="n-date">2026.06</span><p>与宣武医院合作开展基于高密度脑机接口的脑卒中辅助诊疗；横向合作到账约 200 万</p></li>
+          <li><span class="n-date">2025.07</span><p>TransFlex 入选 TRANSDUCERS 2025（美国·佛罗里达），柔性多臂可变刚度植入电极</p></li>
+          <li><span class="n-date">2025.03</span><p>VariDepth (VD-NEA) 发表于 IEEE MEMS 2025，获最佳论文提名奖</p></li>
+          <li><span class="n-date">2025.02</span><p>All-Polymer 神经电极工作投稿 <i>Nature</i>；定制化 3D 植入电极投稿 <i>Science Advances</i></p></li>
+          <li><span class="n-date">2024.11</span><p>FlexConnect 通用引出方案发表于 MicroTAS 2024（加拿大·蒙特利尔）</p></li>
+          <li><span class="n-date">2024.09</span><p>课题组网站上线，长期招收博士后 / 研究生 / 科研助理</p></li>
+        </ul>
+      </div>
+
+      <div class="plate" data-reveal>
+        <img src="img/brain-connects.jpg" alt="BRAIN CONNECTS BEYOND —— 非侵入脑机接口图版：从信号到更深的理解">
+      </div>
+    </section>
+  </section>
+
+  <!-- PI（含图版二） -->
+  <section class="slide" id="pi">
+    <section class="chapter pi-sec">
+        <div class="pi-wrap">
+        <div class="pi-card" data-reveal>
+          <div class="pi-photo"><img src="img/pi.png?v=1" alt="张致同"></div>
+        </div>
+        <div class="pi-body">
+          <div class="sec-head" data-reveal>
+            <span class="sec-no">02</span>
+            <span class="sec-label">PI · 导师</span>
+          </div>
+          <h2 class="sec-title" data-reveal>张致同<br><span class="pi-en">ZHANG ZHITONG</span></h2>
+          <p class="lead" data-reveal>研究覆盖脑机接口系统、先进神经电子界面、可穿戴传感器及系统、脑电信号解码及脑机大模型。工作发表于 <i>Nature</i>、<i>Science Advances</i> 投稿及 IEEE MEMS、TRANSDUCERS、MicroTAS 等会议，两获 IEEE MEMS 最佳论文提名。</p>
+          <div class="honors" data-reveal>
+            <div class="h-row"><span class="h-y">2025</span><p>IEEE MEMS 最佳论文提名奖</p></div>
+            <div class="h-row"><span class="h-y">2022</span><p>IEEE MEMS 最佳论文提名奖</p></div>
+            <div class="h-row"><span class="h-y">2020</span><p>北京市优秀毕业生 · 五四奖章（北京航空航天大学）</p></div>
+            <div class="h-row"><span class="h-y">2019</span><p>国家奖学金</p></div>
+            <div class="h-row"><span class="h-y">2018</span><p>国家奖学金</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="plate plate-bottom" data-reveal>
+        <img src="img/brain-flexible.jpg" alt="FLEXIBLE BRAIN INTERFACE —— 柔性电子，更开放的未来">
+      </div>
+    </section>
+  </section>
+
+  <!-- 研究（设备带 + 七个方向） -->
+  <section class="slide" id="research">
+    <div class="marquee-plate" aria-hidden="true">
+      <div class="marquee-track">
+        <img src="img/devices-strip.jpg?v=3" alt=""><img src="img/devices-strip.jpg?v=3" alt=""><img src="img/devices-strip.jpg?v=3" alt=""><img src="img/devices-strip.jpg?v=3" alt=""><img src="img/devices-strip.jpg?v=3" alt="">
+      </div>
+    </div>
+
+    <section class="chapter">
+      <div class="sec-head" data-reveal>
+        <span class="sec-no">03</span>
+        <span class="sec-label">RESEARCH · 研究方向与项目负责人</span>
+      </div>
+      <h2 class="sec-title" data-reveal>从一个电极，<br>延伸到每一项<mark>具体工作</mark></h2>
+
+      <div class="dirs">
+
+        <div class="dir" data-reveal>
+          <div class="dir-head"><span class="dir-no">Ⅰ</span><div class="dir-t"><h3>脑机接口系统</h3><i>BCI SYSTEMS</i></div></div>
+          <div class="dir-body">
+            <p class="dir-intro">构建植入式与穿戴式脑机接口系统：从高通量柔性电极阵列、低噪声前端，到在体长期稳定记录与实时解码闭环。</p>
+            <div class="person">
+              <div class="member member--mini"><span class="m-seal">张</span><div class="m-info"><h3>张致同 <span class="m-role">PI</span></h3><p>方向负责人 · 电极与系统集成</p></div><span class="m-note">LEAD</span></div>
+              <ul class="works">
+                <li>All-Polymer 神经电极 · 慢性在体记录 <i>Nature (submitted)</i></li>
+                <li>定制化 3D 植入电极 · 匹配神经组织解剖 <i>Sci. Adv. (submitted)</i></li>
+                <li>TransFlex 多臂可变刚度植入电极 <i>TRANSDUCERS 2025</i></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="dir" data-reveal>
+          <div class="dir-head"><span class="dir-no">Ⅱ</span><div class="dir-t"><h3>先进神经电子界面</h3><i>NEURAL INTERFACES</i></div></div>
+          <div class="dir-body">
+            <p class="dir-intro">electrode 与组织的界面工程：材料、结构与文化。</p>
+            <div class="person">
+              <div class="member member--mini"><span class="m-seal">张</span><div class="m-info"><h3>张致同 <span class="m-role">PI</span></h3><p>方向负责人 · 界面材料与结构</p></div><span class="m-note">LEAD</span></div>
+              <ul class="works">
+                <li>VariDepth (VD-NEA) · 立体掩膜实现任意电极深度 <i>IEEE MEMS 2025 · 提名</i></li>
+                <li>FlexConnect · 柔性通用引出与键合界面 <i>MicroTAS 2024 / JCK 2024</i></li>
+                <li>环形微针阵列 · 发上 EEG 干电极 <i>IEEE MEMS 2021</i></li>
+              </ul>
+            </div>
+            <div class="spec-sheet mini">
+              <div class="spec-head"><span class="spec-model">128-CH DRY EEG · MK.I</span><span class="spec-stamp">IN SERVICE ●</span></div>
+              <dl class="spec-rows">
+                <div><dt>ELECTRODE</dt><dd>干式 · 免导电膏</dd></div>
+                <div><dt>CHANNELS</dt><dd>128 · 世界最高密度</dd></div>
+                <div><dt>WEAR TIME</dt><dd>≤ 5 min</dd></div>
+                <div><dt>UNIT</dt><dd>64 ch / 3×3 cm²</dd></div>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        <div class="dir" data-reveal>
+          <div class="dir-head"><span class="dir-no">Ⅲ</span><div class="dir-t"><h3>可穿戴传感器及系统</h3><i>WEARABLE SENSING</i></div></div>
+          <div class="dir-body">
+            <p class="dir-intro">贴着皮肤的柔性传感：把测量穿戴在身上。</p>
+            <div class="person">
+              <div class="member member--mini"><span class="m-seal">张</span><div class="m-info"><h3>张致同 <span class="m-role">PI</span></h3><p>方向负责人 · 柔性传感</p></div><span class="m-note">LEAD</span></div>
+              <ul class="works">
+                <li>FAICS 环形叉指电容传感 · 接近/压力 <i>IEEE MEMS 2022</i></li>
+                <li>铂基穿孔呼吸传感器 · 连续监测 <i>Micromachines 2022</i></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="dir" data-reveal>
+          <div class="dir-head"><span class="dir-no">Ⅳ</span><div class="dir-t"><h3>脑电解码及脑机大模型</h3><i>DECODING &amp; MODEL</i></div></div>
+          <div class="dir-body">
+            <p class="dir-intro">从头皮到皮层内：解码算法、脑基础模型与疾病辅助诊断。</p>
+            <div class="figure"><div class="fig-bar"><span>FIG. 3</span><span>DECODING ACCURACY · 解码准确率</span></div><canvas id="cvFig"></canvas></div>
+            <div class="person">
+              <div class="member member--mini"><span class="m-seal">刘</span><div class="m-info"><h3>刘鼎坤</h3><p>脑机接口多模态大模型 · 竞赛主力</p></div><span class="m-note">BCI 2026</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dir" data-reveal>
+          <div class="dir-head"><span class="dir-no">Ⅴ</span><div class="dir-t"><h3>EEG 辅助诊断与脑基础模型</h3><i>NEURODIAG AI</i></div></div>
+          <div class="dir-body">
+            <p class="dir-intro">面向神经精神疾病的 EEG 辅助诊断：跨被试小样本适配、情绪解码基础模型、脑卒中辅助诊疗（宣武医院合作）。</p>
+            <div class="person">
+              <div class="member member--mini"><span class="m-seal">王</span><div class="m-info"><h3>王君逸</h3><p>EEG 基础模型 · 跨被试适配 / 持续学习</p></div><span class="m-note">AAAI 2027</span></div>
+              <ul class="works"><li>EEG 基础模型跨被试小样本提示微调 · Training-free <i>AAAI 2027 (under review)</i></li></ul>
+            </div>
+            <div class="person">
+              <div class="member member--mini"><span class="m-seal">刘</span><div class="m-info"><h3>刘丽华</h3><p>情绪脑机接口 · GNN-Mamba 基础模型</p></div><span class="m-note">EMOTION</span></div>
+              <ul class="works"><li>脑机接口情绪解码基础模型 · GNN-Mamba 时空联合</li></ul>
+            </div>
+            <div class="person">
+              <div class="member member--mini"><span class="m-seal">孙</span><div class="m-info"><h3>孙钰晓</h3><p>神经退行性疾病 · 多智能体辅助诊疗</p></div><span class="m-note">MSViT</span></div>
+              <ul class="works"><li>基于高密度脑机接口的脑卒中辅助诊疗 · 宣武医院合作</li></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="dir" data-reveal>
+          <div class="dir-head"><span class="dir-no">Ⅵ</span><div class="dir-t"><h3>类脑智能与在线学习</h3><i>BRAIN-INSPIRED</i></div></div>
+          <div class="dir-body">
+            <p class="dir-intro">脉冲神经网络的在线学习与表征漂移；AI 自主科研共生平台。</p>
+            <div class="person">
+              <div class="member member--mini"><span class="m-seal">沈</span><div class="m-info"><h3>沈思成</h3><p>类脑在线学习 · Spiking Transformer</p></div><span class="m-note">SNN</span></div>
+              <ul class="works"><li>Spiking Transformer · 在线学习算法集成与新一代架构</li></ul>
+            </div>
+            <div class="person">
+              <div class="member member--mini"><span class="m-seal">马</span><div class="m-info"><h3>马晓猛</h3><p>AI 自主科研 · Meta Research 平台</p></div><span class="m-note">AGENT</span></div>
+              <ul class="works"><li>Meta Research · AI 自主科研循环平台</li></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="dir" data-reveal>
+          <div class="dir-head"><span class="dir-no">Ⅶ</span><div class="dir-t"><h3>眼电交互与可穿戴神经接口</h3><i>EOG INTERFACE</i></div></div>
+          <div class="dir-body">
+            <p class="dir-intro">仅双通道眼电(EOG)的实时交互：6 分类手势指令、跨佩戴 81.7%、CPU 1.2ms/跳——把先验逻辑交给模型学习。</p>
+            <div class="person">
+              <div class="member member--mini"><span class="m-seal">李</span><div class="m-info"><h3>李文宇</h3><p>眼电交互 ACED · 可穿戴神经接口</p></div><span class="m-note">ICLR 2027</span></div>
+              <ul class="works">
+                <li>ACED · 自适应因果检测架构，Re-wear-Robust</li>
+                <li>自然场景基线漂移建模 · 先验逻辑信号化</li>
+                <li>延迟 668–940 ms · 200ms 节拍 160 倍算力余量</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </section>
+
+  <!-- 论文 -->
+  <section class="slide" id="publications">
+    <section class="chapter">
+      <div class="sec-head" data-reveal>
+        <span class="sec-no">04</span>
+        <span class="sec-label">PUBLICATIONS · 论文</span>
+      </div>
+      <h2 class="sec-title" data-reveal>代表性论文与会议</h2>
+      <ol class="pubs">
+        <li data-reveal><span class="p-no">01</span><div class="p-body"><h3>A Multilayer Intracortical Probe with Polymer-Only Recording Sites and Interconnects</h3><p class="p-ven"><i>IEDM 2026</i> · ACCEPTED · 北京中关村学院首次</p></div><span class="p-tag">ACCEPTED</span></li>
+        <li data-reveal><span class="p-no">02</span><div class="p-body"><h3>STAMA: A Stretchable All-Polymer Microneedle Array for Low-Impedance Dry Electrophysiological Recording</h3><p class="p-ven"><i>IEEE MEMS 2027</i> · UNDER REVIEW · 通讯作者</p></div><span class="p-tag">REVIEW</span></li>
+        <li data-reveal><span class="p-no">03</span><div class="p-body"><h3>Monolithic Three-dimensional Fabrication of Implantable Neural Microelectrode Arrays via Single-exposure Stereolithography</h3><p class="p-ven"><i>IEEE MEMS 2027</i> · UNDER REVIEW · 通讯作者</p></div><span class="p-tag">REVIEW</span></li>
+        <li data-reveal><span class="p-no">04</span><div class="p-body"><h3>基于新被试小样本支持集的参数高效提示微调 —— EEG 基础模型跨被试适配</h3><p class="p-ven"><i>AAAI 2027</i> · UNDER REVIEW</p></div><span class="p-tag">REVIEW</span></li>
+        <li data-reveal><span class="p-no">05</span><div class="p-body"><h3>BrainSeg: Probing Category-Specific Neural Representations through Dense Semantic Decoding</h3><p class="p-ven"><i>ICLR 2027</i> · PREPARATION</p></div><span class="p-tag">PREP</span></li>
+        <li data-reveal><span class="p-no">06</span><div class="p-body"><h3>ACED: An Adaptive Causal Detection Architecture for Re-wear-Robust EOG Gesture Commands</h3><p class="p-ven"><i>ICLR 2027</i> · PREPARATION · 双通道眼电 · 跨佩戴 81.7%</p></div><span class="p-tag">PREP</span></li>
+        <li data-reveal><span class="p-no">07</span><div class="p-body"><h3>All-Polymer Neural Electrodes Enabled by a High-Performance Conductive Polymer for Chronic In Vivo Recording</h3><p class="p-ven"><i>Nature</i> · 2025</p></div><span class="p-tag">SUBMITTED</span></li>
+        <li data-reveal><span class="p-no">08</span><div class="p-body"><h3>Customized 3D Implantable Neural Electrodes Matching the Anatomical Structure of Neural Tissues</h3><p class="p-ven"><i>Science Advances</i> · 2025</p></div><span class="p-tag">SUBMITTED</span></li>
+        <li data-reveal><span class="p-no">09</span><div class="p-body"><h3>TransFlex: A Flexible Multi-shank Implantable Neuroelectrode with Variable Stiffness Based on Patternable Soluble Dextran-Pullulan Support Layer</h3><p class="p-ven">TRANSDUCERS 2025 · Florida, USA</p></div><span class="p-tag">ACCEPTED</span></li>
+        <li data-reveal><span class="p-no">10</span><div class="p-body"><h3>Breaking the Dimension Barrier: VariDepth Neuroelectrode Array (VD-NEA) by a Novel Stereo Mask for Achieving Arbitrary Electrode Depth in Neural Recording</h3><p class="p-ven">IEEE MEMS 2025 · 415–418</p></div><span class="p-tag">提名</span></li>
+        <li data-reveal><span class="p-no">11</span><div class="p-body"><h3>FlexConnect: An Electromechanically Reliable, Flexible, Universal Leadout Solution for Soft Bioelectronic Interface</h3><p class="p-ven">MicroTAS 2024 · Montréal · 1199</p></div><span class="p-tag">CONF</span></li>
+        <li data-reveal><span class="p-no">12</span><div class="p-body"><h3>FlexConnect: A Flexible, Electromechanically Stable and Universal Bonding Interface for Soft Neural Electrodes</h3><p class="p-ven">JCK MEMS/NEMS 2024 · Chengdu</p></div><span class="p-tag">CONF</span></li>
+        <li data-reveal><span class="p-no">13</span><div class="p-body"><h3>Low-Cost, Flexible Annular Interdigital Capacitive Sensor (FAICS) with Carbon Black-PDMS Sensitive Layer for Proximity and Pressure Sensing</h3><p class="p-ven">IEEE MEMS 2022 · Tokyo · 35–38</p></div><span class="p-tag">CONF</span></li>
+        <li data-reveal><span class="p-no">14</span><div class="p-body"><h3>Annular Micro-Needle Array as a Minimally Invasive Flexible Dry Electrode for on-Hair EEG Recording</h3><p class="p-ven">IEEE MEMS 2021 · Florida · 270–273</p></div><span class="p-tag">CONF</span></li>
+        <li data-reveal><span class="p-no">15</span><div class="p-body"><h3>A Low-Cost Flexible Perforated Respiratory Sensor Based on Platinum for Continuous Respiratory Monitoring</h3><p class="p-ven">Micromachines 2022 · 13(10): 1743</p></div><span class="p-tag">JOURNAL</span></li>
+      </ol>
+    </section>
+  </section>
+
+  <!-- 加入 + 页脚 -->
+  <section class="slide" id="join">
+    <section class="chapter join">
+      <div class="sec-head" data-reveal>
+        <span class="sec-no">05</span>
+        <span class="sec-label">JOIN US · 加入我们</span>
+      </div>
+      <h2 class="sec-title" data-reveal>如果你也相信，<br>思想可以被聆听。</h2>
+      <p class="join-sub" data-reveal>长期招收博士后、博士 / 硕士研究生与科研助理。<br>神经科学 / 材料与器件 / EEG 解码与基础模型 / 多智能体系统——皆是同路人。</p>
+      <a class="cmd" href="mailto:zhangzhitong@bza.edu.cn" data-reveal>
+        <span class="cmd-prompt">EMAIL ▸</span>
+        <span class="cmd-text">zhangzhitong@bza.edu.cn</span>
+      </a>
+      <div class="join-foot" data-reveal>
+        <p class="join-addr">北京中关村学院 · 脑机接口课题组</p>
+        <div class="foot-barcode"></div>
+        <p class="foot-line">Zhang Lab · NeuroDiagAI 项目组 © 2026 · 北京中关村学院</p>
+        <p class="foot-note">PROUDLY OPERATED BY HUMANS* <i>*with machine assistance</i></p>
+      </div>
+    </section>
+  </section>
+
+</main>
+
+
+<script src="js/app.js?v=24"></script>
+<script src="js/deck.js?v=2"></script>
+</body>
+</html>

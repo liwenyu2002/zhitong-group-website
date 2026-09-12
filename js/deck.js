@@ -1,0 +1,121 @@
+/* ============================================================
+   Zhang Lab · 换页引擎（导航栏驱动）
+   点导航栏 → 页面左右滑动切换；页内为正常竖向滚动
+   辅助：移动端横滑、← → 键、底部圆点、hash 同步
+   大脑画布进度通过 window.__deckProgress 暴露给 app.js
+   ============================================================ */
+(() => {
+  "use strict";
+
+  const deck = document.getElementById("deck");
+  if (!deck) return;
+  const slides = Array.from(deck.querySelectorAll(".slide"));
+  const N = slides.length;
+  const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const dotsBox = document.getElementById("deckDots");
+  const dots = [];
+  if (dotsBox) {
+    slides.forEach((s, i) => {
+      const d = document.createElement("i");
+      d.title = s.id || "";
+      d.addEventListener("click", () => go(i));
+      dotsBox.appendChild(d);
+      dots.push(d);
+    });
+  }
+
+  let idx = 0, pos = 0, target = 0, gen = 0;
+
+  const indexOfId = id => slides.findIndex(s => s.id === id);
+
+  function paint() {
+    deck.style.transform = `translate3d(${(-pos * 100).toFixed(3)}vw, 0, 0)`;
+    window.__deckProgress = N > 1 ? clamp(pos / (N - 1), 0, 1) : 0;
+  }
+
+  function render() {
+    dots.forEach((d, i) => d.classList.toggle("on", i === idx));
+    document.querySelectorAll(".topnav a[data-goto]").forEach(a => {
+      a.classList.toggle("nav-on", a.dataset.goto === slides[idx].id);
+    });
+    const id = slides[idx].id;
+    if (id) history.replaceState(null, "", "#" + id);
+  }
+
+  /* 逐帧飞向目标（代数令牌：每次 go 都生成新链，旧链自动失效，绝不卡死） */
+  function animTo(g) {
+    const step = () => {
+      if (g !== gen) return;
+      try {
+        pos = lerp(pos, target, 0.1);
+        paint();
+      } catch (e) { /* 下帧重试 */ }
+      if (Math.abs(target - pos) < 0.0015) {
+        pos = target; paint();
+        window.__deckProgress = N > 1 ? clamp(pos / (N - 1), 0, 1) : 0;
+        return;
+      }
+      requestAnimationFrame(() => step(g));
+    };
+    requestAnimationFrame(() => step(g));
+  }
+
+  function go(i) {
+    i = clamp(i, 0, N - 1);
+    idx = i;
+    target = i;
+    if (reduced) { pos = target; paint(); render(); return; }
+    gen++;
+    animTo(gen);
+    render();
+  }
+
+  /* 导航栏与页内跳转链接（核心换页方式） */
+  document.querySelectorAll("a[data-goto]").forEach(a => {
+    a.addEventListener("click", e => {
+      e.preventDefault();
+      const i = indexOfId(a.dataset.goto);
+      if (i >= 0) go(i);
+    });
+  });
+
+  /* 圆点 */
+  dots.forEach((d, i) => d.addEventListener("click", () => go(i)));
+
+  /* ← → 键（辅助） */
+  window.addEventListener("keydown", e => {
+    if (["ArrowRight", "PageDown"].includes(e.key)) go(idx + 1);
+    else if (["ArrowLeft", "PageUp"].includes(e.key)) go(idx - 1);
+    else if (e.key === "Home") go(0);
+    else if (e.key === "End") go(N - 1);
+  });
+
+  /* 移动端横滑（辅助） */
+  let tx = 0, ty = 0;
+  window.addEventListener("touchstart", e => {
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+  }, { passive: true });
+  window.addEventListener("touchend", e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    const dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+      go(idx + (dx < 0 ? 1 : -1));
+    }
+  }, { passive: true });
+
+  /* 前进后退 */
+  window.addEventListener("hashchange", () => {
+    const i = indexOfId(location.hash.slice(1));
+    if (i >= 0 && i !== idx) go(i);
+  });
+
+  /* 启动 */
+  const start = indexOfId(location.hash.slice(1));
+  idx = start >= 0 ? start : 0;
+  pos = target = idx;
+  paint();
+  render();
+})();
