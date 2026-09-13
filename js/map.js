@@ -97,7 +97,7 @@
         id: k.id, label: k.label, kind: "key", dir: k.dir,
         x: prev && prev.x !== undefined ? prev.x : CX + Math.cos(a) * rr,
         y: prev && prev.y !== undefined ? prev.y : CY + Math.sin(a) * rr,
-        wobA: 3.4, wobS: 0.55 + (i % 5) * 0.09, ph: i * 1.9
+        wobA: 3.4, wobS: 0.9 + (i % 5) * 0.13, ph: i * 1.9
       });
     });
 
@@ -110,7 +110,7 @@
         tilt: Math.sin((i + 2) * 12.7) * 0.05,
         x: prev && prev.x !== undefined ? prev.x : CX + Math.cos(ang) * R_MEM,
         y: prev && prev.y !== undefined ? prev.y : CY + Math.sin(ang) * R_MEM,
-        ang, wobA: 4, wobS: 0.35 + (i % 4) * 0.07, ph: i * 1.4
+        ang, wobA: 4, wobS: 0.6 + (i % 4) * 0.1, ph: i * 1.4
       });
     });
 
