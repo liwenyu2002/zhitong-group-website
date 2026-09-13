@@ -41,6 +41,11 @@
     document.querySelectorAll(".topnav a[data-goto]").forEach(a => {
       a.classList.toggle("nav-on", a.dataset.goto === slides[idx].id);
     });
+    // 手机横滑导航条：当前页自动滚到可视中间
+    const on = document.querySelector(".topnav a.nav-on");
+    if (on && on.scrollIntoView) {
+      try { on.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" }); } catch (e) {}
+    }
     const id = slides[idx].id;
     if (id) history.replaceState(null, "", "#" + id);
   }

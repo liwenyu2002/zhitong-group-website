@@ -898,6 +898,7 @@ main { position: relative; z-index: 1; }
   font-size: 12px;
   letter-spacing: 1px;
 }
+.nav-links { display: contents; }
 .topnav a {
   padding: 7px 12px;
   color: var(--ink);
@@ -930,14 +931,25 @@ main { position: relative; z-index: 1; }
   .lead { font-size: 14.5px; }
   .sec-head { margin-bottom: 16px; }
 
-  /* 顶部导航：横向滑动 */
+  /* 顶部导航：页面链接横滑成条，语言与加入固定在右 */
   .topnav {
     top: 8px; right: 8px; left: 8px;
-    overflow-x: auto; -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; gap: 2px;
+    overflow: visible; gap: 6px; align-items: stretch;
   }
-  .topnav::-webkit-scrollbar { display: none; }
-  .topnav a { padding: 6px 9px; font-size: 11px; white-space: nowrap; flex: none; }
+  .nav-links {
+    display: flex; flex: 1 1 auto; min-width: 0; gap: 3px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .topnav a {
+    flex: none; white-space: nowrap;
+    padding: 8px 12px; font-size: 12px; min-height: 38px;
+    display: inline-flex; align-items: center;
+  }
+  .lang-toggle, .topnav .nav-cta { flex: none; display: inline-flex; align-items: center; }
 
   /* 首屏 */
   .hero { min-height: auto; padding: 70px 0 0; flex-direction: column; align-items: stretch; }
@@ -1508,3 +1520,50 @@ html, body {
 }
 
 /* 图谱调试指示 */
+
+/* 成果页：右侧业余成果（可容纳多张卡片） */
+.pubs-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 48px;
+  align-items: start;
+}
+.pubs-grid .pubs { max-width: none; }
+.side-quests { /* 与左列一致，随页面滚动 */ }
+.sq-cap {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--ink);
+  border-bottom: 1px dashed var(--hair);
+  padding-bottom: 8px;
+}
+.sq-cap em { font-style: normal; color: var(--ink-3); letter-spacing: 2px; }
+html[lang="en"] .sq-cap em { display: none; }
+.sq-card, .sq-card * { text-decoration: none; }
+/* 彩蛋 8bit 橱柜 */
+.cab8 { position: relative; margin-top: 20px; }
+.cab8-svg { display: block; width: 100%; height: auto; }
+.cab8-hit {
+  position: absolute; left: 10%; top: 12.75%; width: 37%; height: 33.4%;
+  display: block;
+}
+.cab8-hit:hover { background: rgba(61, 79, 161, 0.14); box-shadow: inset 0 0 0 3px #3d4fa1; }
+.cab8-cap { margin-top: 10px; font-size: 12.5px; color: var(--ink-2); }
+.cab8-cap b { font-family: var(--mono); letter-spacing: 1px; color: var(--ink); margin-right: 6px; }
+.egg-anim {
+  animation: egg-bob 2.8s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: 50% 88%;
+  image-rendering: pixelated;
+}
+@keyframes egg-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  32% { transform: translateY(-5px) rotate(-3deg); }
+  62% { transform: translateY(0) rotate(2.5deg); }
+  80% { transform: translateY(-2px) rotate(-1deg); }
+}
+@media (max-width: 1200px) {
+  .pubs-grid { grid-template-columns: 1fr; }
+  .cab8 { max-width: 460px; }
+}
