@@ -50,6 +50,23 @@
   /* 仍有关键词留存的方向参与扇区划分 */
   const TD = T.filter(t => K.some(k => k.dir === t.id));
 
+  /* 英文标签（EN 模式下画布文案切换） */
+  const EN_KW = {
+    "EOG": "EOG", "ACED": "ACED", "柔性传感": "Flexible sensing",
+    "跨被试适配": "Cross-subject fit", "基础模型": "Foundation models",
+    "情绪解码": "Emotion decoding", "GNN-Mamba": "GNN-Mamba",
+    "脑卒中诊疗": "Stroke care", "多智能体": "Multi-agent",
+    "多模态大模型": "Multimodal LLM", "语义解码": "Semantic decoding",
+    "BrainSeg": "BrainSeg", "Spiking": "Spiking", "在线学习": "Online learning",
+    "自主科研": "Autonomous research", "Meta Research": "Meta Research"
+  };
+  const EN_MEM = {
+    "李文宇": "Wenyu Li", "王君逸": "Junyi Wang", "刘丽华": "Lihua Liu",
+    "孙钰晓": "Yuxiao Sun", "刘鼎坤": "Dingkun Liu", "沈思成": "Sicheng Shen",
+    "马晓猛": "Xiaomeng Ma"
+  };
+  const enLab = () => (document.documentElement.lang || "zh").slice(0, 2) === "en";
+
   const INK = "23,23,23", RED = "217,58,43", SOFT = "139,130,113";
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -94,7 +111,7 @@
       const rr = R_KEY * RADII[ki % RADII.length];
       const prev = old.get(k.id);
       nodes.push({
-        id: k.id, label: k.label, kind: "key", dir: k.dir,
+        id: k.id, label: k.label, en: EN_KW[k.label] || k.label, kind: "key", dir: k.dir,
         x: prev && prev.x !== undefined ? prev.x : CX + Math.cos(a) * rr,
         y: prev && prev.y !== undefined ? prev.y : CY + Math.sin(a) * rr,
         wobA: 3.4, wobS: 0.9 + (i % 5) * 0.13, ph: i * 1.9
@@ -106,7 +123,7 @@
       const ang = -Math.PI / 2 + (i + 0.5) * (Math.PI * 2 / M.length);
       const prev = old.get(m.id);
       nodes.push({
-        id: m.id, label: m.label, seal: m.seal, kind: "mem",
+        id: m.id, label: m.label, en: EN_MEM[m.label] || m.label, seal: m.seal, kind: "mem",
         tilt: Math.sin((i + 2) * 12.7) * 0.05,
         x: prev && prev.x !== undefined ? prev.x : CX + Math.cos(ang) * R_MEM,
         y: prev && prev.y !== undefined ? prev.y : CY + Math.sin(ang) * R_MEM,
@@ -218,9 +235,9 @@
       if (n.kind !== "key") return;
       const [x, y] = P(n);
       const hot = act && act.has(n.id);
-      ctx.font = (hot ? "600 " : "") + "12.5px 'Songti SC', serif";
+      ctx.font = (hot ? "600 " : "") + (enLab() ? "11px" : "12.5px") + " 'Songti SC', serif";
       ctx.fillStyle = hot ? "rgba(" + RED + ",1)" : "rgba(" + INK + ",0.66)";
-      ctx.fillText(n.label, x, y);
+      ctx.fillText(enLab() ? (n.en || n.label) : n.label, x, y);
     });
 
     // 成员落款（外环）：朱砂印章（红底白文）+ 横排姓名
@@ -229,6 +246,7 @@
       const [x, y] = P(n);
       const em = act && act.has(n.id);
       const c = Math.cos(n.ang), s = Math.sin(n.ang);
+      const name = enLab() ? (n.en || n.label) : n.label;
       ctx.save();
       ctx.translate(x, y);
       // 通电时的朱砂墨晕
@@ -260,10 +278,10 @@
       // 名字：沿半径向外横排
       ctx.font = (em ? "600 " : "") + "13.5px 'Songti SC', serif";
       ctx.fillStyle = em ? "rgba(" + RED + ",1)" : "rgba(" + INK + ",0.9)";
-      if (c > 0.35) { ctx.textAlign = "left"; ctx.fillText(n.label, sw / 2 + 7, 1); }
-      else if (c < -0.35) { ctx.textAlign = "right"; ctx.fillText(n.label, -sw / 2 - 7, 1); }
-      else if (s < 0) { ctx.textAlign = "center"; ctx.fillText(n.label, 0, -sw / 2 - 10); }
-      else { ctx.textAlign = "center"; ctx.fillText(n.label, 0, sw / 2 + 14); }
+      if (c > 0.35) { ctx.textAlign = "left"; ctx.fillText(name, sw / 2 + 7, 1); }
+      else if (c < -0.35) { ctx.textAlign = "right"; ctx.fillText(name, -sw / 2 - 7, 1); }
+      else if (s < 0) { ctx.textAlign = "center"; ctx.fillText(name, 0, -sw / 2 - 10); }
+      else { ctx.textAlign = "center"; ctx.fillText(name, 0, sw / 2 + 14); }
       ctx.restore();
     });
   }

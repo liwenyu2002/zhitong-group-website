@@ -66,6 +66,8 @@
     "东南大学": "Southeast University",
     "帮你想出不一样的点子": "Helps you come up with delightfully different ideas",
     "彩蛋": "Easter Eggs",
+    "人员课题图谱": "Member\u2013Topic Map",
+    "精选论文": "Selected Publications",
     "许海凌 <span class=\"mc-role\">博士</span>": "Hailing Xu <span class=\"mc-role\">PhD</span>",
     "厦门大学": "Xiamen University",
     "下一颗彩蛋": "The next egg",
