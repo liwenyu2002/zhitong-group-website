@@ -1259,65 +1259,102 @@ html, body {
 /* ============================================================
    成员页：卡片 + 人员课题图谱
    ============================================================ */
+/* ── 成员卡：极简笔画线稿风 ── */
 .member-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px 20px;
   margin-top: 26px;
 }
 .member-card {
+  position: relative;
   display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  padding: 16px 18px;
-  border: 1.5px solid var(--ink);
-  border-radius: 12px;
-  background: rgba(253, 250, 241, 0.6);
-  box-shadow: 3px 3px 0 rgba(23, 23, 23, 0.2);
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s;
+  gap: 18px;
+  align-items: center;
+  padding: 20px 22px 20px 18px;
+  background: transparent;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.member-card:hover { transform: translate(-2px, -3px); box-shadow: 6px 7px 0 rgba(23, 23, 23, 0.25); }
-.ph-tile {
+/* 手绘线框：每卡独一无二的抖动描边（内嵌 SVG） */
+.mc-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--ink);
+  pointer-events: none;
+}
+.member-card:hover { transform: translate(-1px, -3px) rotate(-0.4deg); }
+
+/* 线稿速写头像 */
+.ph-sketch {
   flex: none;
-  width: 64px; height: 76px;
-  display: grid;
-  place-items: center;
-  background: var(--panel);
-  border: 1.5px solid var(--ink-3);
-  border-radius: 8px;
-  font-family: var(--serif);
-  font-size: 30px;
-  color: var(--ink-2);
+  width: 128px; height: 145px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  opacity: 0.9;
+}
+.ph-sketch svg { width: 100%; height: 100%; }
+
+/* 张老师照片：线稿框（细线 + 四角短线装饰） */
+.ph-photo-sketch {
+  position: relative;
+  flex: none;
+  width: 138px; height: 156px;
+  border: 1.5px solid var(--ink);
+  border-radius: 4px 10px 5px 9px / 9px 5px 10px 4px;
   overflow: hidden;
 }
-.ph-tile img { width: 100%; height: 100%; object-fit: cover; }
+.ph-photo-sketch img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 22%;
+  filter: saturate(0.82) contrast(0.96);
+  opacity: 0.92;
+}
+.ph-photo-sketch img.pos-a { object-position: 50% 18%; }
+
 .mc-info { flex: 1; min-width: 0; }
-.mc-info h3 { font-size: 16.5px; font-weight: 700; }
+.mc-info h3 {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
 .mc-role {
   font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 1px;
+  font-size: 9.5px;
+  letter-spacing: 1.5px;
   color: var(--red);
   border: 1px solid var(--red);
-  border-radius: 4px;
-  padding: 1px 5px;
-  margin-left: 6px;
+  border-radius: 3px 8px 4px 7px / 7px 4px 8px 3px;
+  padding: 1px 6px;
+  margin-left: 8px;
   vertical-align: 2px;
 }
-.mc-meta { font-size: 12.5px; color: var(--ink-2); margin: 5px 0 0; }
+.mc-meta {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin: 6px 0 0;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--hair);
+}
 .mc-k {
   font-family: var(--mono);
   font-size: 10px;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   color: var(--ink-3);
-  margin: 0 6px 0 0;
+  margin-right: 6px;
 }
-.mc-k + .mc-k { margin-left: 14px; }
+.mc-k + .mc-k { margin-left: 16px; }
 .mc-todo { color: var(--ink-3); opacity: 0.7; }
 .mc-dir {
   margin-top: 7px;
-  font-size: 13px;
+  font-family: var(--serif);
+  font-size: 13.5px;
   color: var(--red);
+  letter-spacing: 0.3px;
 }
 
 .map-wrap { margin-top: 54px; }
@@ -1352,7 +1389,10 @@ html, body {
 }
 .map-nodes text.dim { fill: var(--ink-3); }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
+  .member-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px) {
   .member-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 700px) {

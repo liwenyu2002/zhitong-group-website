@@ -9,12 +9,12 @@
   const membersIdx = Array.from(deck.querySelectorAll(":scope > .slide")).indexOf(section);
 
   const M = [
-    { id: "zhang",  label: "张致同 PI", dirs: ["d1", "d2", "d3"], pi: true,  seal: "张" },
     { id: "liwy",   label: "李文宇", dirs: ["d7"], seal: "李" },
     { id: "wangjy", label: "王君逸", dirs: ["d5"], seal: "王" },
     { id: "liulh",  label: "刘丽华", dirs: ["d5"], seal: "刘" },
     { id: "sunyx",  label: "孙钰晓", dirs: ["d5"], seal: "孙" },
     { id: "liudk",  label: "刘鼎坤", dirs: ["d4"], seal: "刘" },
+    { id: "zhangtc", label: "张天赐", dirs: ["d4"], seal: "张" },
     { id: "shensc", label: "沈思成", dirs: ["d6"], seal: "沈" },
     { id: "maxm",   label: "马晓猛", dirs: ["d6"], seal: "马" }
   ];
