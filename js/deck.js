@@ -45,8 +45,10 @@
     if (id) history.replaceState(null, "", "#" + id);
   }
 
-  /* 逐帧飞向目标（代数令牌：每次 go 都生成新链，旧链自动失效，绝不卡死） */
+  /* 逐帧飞向目标（代数令牌：每次 go 都生成新链，旧链自动失效，绝不卡死）
+     rAF 被抑制（后台标签 / 节流）时由 50ms 定时器兜底推进 */
   function animTo(g) {
+    const t0 = performance.now();
     const step = () => {
       if (g !== gen) return;
       try {
@@ -61,12 +63,32 @@
       requestAnimationFrame(() => step(g));
     };
     requestAnimationFrame(() => step(g));
+    const fb = setInterval(() => {
+      if (g !== gen) { clearInterval(fb); return; }
+      const settled = Math.abs(target - pos) < 0.0015;
+      const timedOut = performance.now() - t0 > 1200;   // 节流环境下直接落位
+      if (settled || timedOut) {
+        pos = target; paint();
+        window.__deckProgress = N > 1 ? clamp(pos / (N - 1), 0, 1) : 0;
+        clearInterval(fb);
+        return;
+      }
+      pos = lerp(pos, target, 0.1);
+      paint();
+    }, 50);
+  }
+
+  /* 锚点原生滚动会顶偏 html.scrollLeft，统一归零 */
+  function resetNativeScroll() {
+    document.documentElement.scrollLeft = 0;
+    document.body.scrollLeft = 0;
   }
 
   function go(i) {
     i = clamp(i, 0, N - 1);
     idx = i;
     target = i;
+    resetNativeScroll();
     if (reduced) { pos = target; paint(); render(); return; }
     gen++;
     animTo(gen);
@@ -108,14 +130,17 @@
 
   /* 前进后退 */
   window.addEventListener("hashchange", () => {
+    resetNativeScroll();
     const i = indexOfId(location.hash.slice(1));
     if (i >= 0 && i !== idx) go(i);
+    resetNativeScroll();
   });
 
   /* 启动 */
   const start = indexOfId(location.hash.slice(1));
   idx = start >= 0 ? start : 0;
   pos = target = idx;
+  resetNativeScroll();
   paint();
   render();
 })();
