@@ -638,7 +638,8 @@ main { position: relative; z-index: 1; }
 /* ── 02 PI ── */
 .pi-wrap {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  /* minmax(0,1fr)：防止列被轮播图 max-content 撑破 */
+  grid-template-columns: 300px minmax(0, 1fr);
   gap: 56px;
   align-items: start;
   margin-top: 12px;
@@ -1047,6 +1048,64 @@ main { position: relative; z-index: 1; }
   margin-top: 4px;
 }
 .dir-intro { color: var(--ink-2); font-size: 15px; max-width: 720px; margin: 6px 0 18px 64px; }
+/* 方向：简介 + 侧图 */
+.dir-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 40px;
+  align-items: start;
+  margin: 8px 0 4px 64px;
+}
+.dir-text .dir-intro { margin: 0 0 10px; max-width: none; }
+.dir-text .dir-intro:last-child { margin-bottom: 0; }
+.dir-fig {
+  margin: 0;
+  background: #fdfaf1;
+  border: 1px solid var(--hair);
+  border-radius: 6px;
+  padding: 10px 10px 8px;
+}
+.dir-fig img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  border-radius: 2px;
+}
+.dir-fig figcaption {
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px dashed var(--hair);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  color: var(--ink-3);
+}
+.dir .dir-row .figure { margin: 0; }
+.dir-text .figure { margin: 16px 0 0; max-width: 520px; }
+
+/* PI 页精选论文 */
+.pi-pubs { margin: 46px 0 6px; }
+.pi-pubs-cap {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 3px;
+  border-bottom: 1px dashed var(--hair);
+  padding-bottom: 8px;
+}
+.pi-pubs-cap em { font-style: normal; color: var(--ink-3); letter-spacing: 2px; }
+.pubs--mini { margin-top: 0; border-top: 0; max-width: none; }
+.pubs--mini li { padding: 11px 2px; gap: 18px; }
+.pubs--mini .p-body h3 { font-size: 14.5px; }
+.pubs--mini .p-tag { font-size: 9.5px; padding: 3px 8px; transform: rotate(2deg); }
+.pubs--mini li:nth-child(3) .p-tag,
+.pubs--mini li:nth-child(4) .p-tag {
+  color: inherit; border-color: var(--ink); background: #fdfaf1; transform: rotate(2deg);
+}
+.pubs--mini li:nth-child(6) .p-tag,
+.pubs--mini li:nth-child(7) .p-tag { color: var(--red); border-color: var(--red); }
 .person { padding: 14px 0 6px 64px; }
 .person + .person { border-top: 1px dashed var(--hair); }
 .person .member { padding: 6px 0 2px; }
@@ -1058,6 +1117,10 @@ main { position: relative; z-index: 1; }
   .dir { padding: 26px 0 18px; }
   .dir-intro, .person, .dir .spec-sheet.mini, .dir .figure { margin-left: 0; }
 }
+@media (max-width: 1100px) {
+  .dir-row { grid-template-columns: 1fr; margin-left: 0; gap: 22px; }
+  .dir-fig, .dir .dir-row .figure { max-width: 480px; }
+}
 
 /* ── 电极实物轮播图版 ── */
 .marquee-plate {
@@ -1065,6 +1128,10 @@ main { position: relative; z-index: 1; }
   border-bottom: 1px solid var(--hair);
   background: #efeadd;
   overflow: hidden;
+  /* 上下各裁 1/5：容器高 = 图片高 × 0.6 */
+  height: 150px;
+  display: flex;
+  align-items: center;
 }
 .marquee-track {
   display: flex;
@@ -1085,7 +1152,43 @@ main { position: relative; z-index: 1; }
   .marquee-track { animation: none; }
 }
 @media (max-width: 700px) {
+  .marquee-plate { height: 90px; }
   .marquee-track img { height: 150px; }
+}
+
+/* PI 页：姓名大字与电极轮播并排 */
+.pi-toprow {
+  display: flex;
+  align-items: center;
+  gap: 42px;
+}
+.pi-toprow .marquee-plate {
+  flex: 1;
+  min-width: 0;
+  border-top: 1px solid var(--hair);
+  position: relative;
+  margin-top: -14px;   /* 比标题中线稍高一点 */
+}
+/* 撕裂口：轮播像从手撕纸缝里穿过 */
+.pi-toprow .marquee-plate::before,
+.pi-toprow .marquee-plate::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 36px;
+  z-index: 2;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 150' preserveAspectRatio='none'><filter id='b'><feGaussianBlur stdDeviation='1.1'/></filter><path d='M0,0 L13,0 L8,11 L16,24 L7,37 L14,51 L6,66 L15,80 L8,94 L17,108 L7,122 L14,135 L9,146 L13,150 L0,150 Z' fill='%23eae4d2'/><path d='M13,0 L8,11 L16,24 L7,37 L14,51 L6,66 L15,80 L8,94 L17,108 L7,122 L14,135 L9,146 L13,150' fill='none' stroke='rgba(23,23,23,0.15)' stroke-width='2.6' filter='url(%23b)' transform='translate(2.5,0)'/><path d='M13,0 L8,11 L16,24 L7,37 L14,51 L6,66 L15,80 L8,94 L17,108 L7,122 L14,135 L9,146 L13,150' fill='none' stroke='rgba(23,23,23,0.28)' stroke-width='1'/></svg>");
+}
+.pi-toprow .marquee-plate::before { left: 0; }
+.pi-toprow .marquee-plate::after { right: 0; transform: scaleX(-1); }
+@media (max-width: 900px) {
+  .pi-toprow { flex-direction: column; align-items: stretch; gap: 24px; }
+  .pi-toprow .marquee-plate { margin-top: 0; }
+  .pi-toprow .marquee-plate::before,
+  .pi-toprow .marquee-plate::after { display: none; }
 }
 
 /* ============================================================
@@ -1348,6 +1451,11 @@ html, body {
   margin-right: 6px;
 }
 .mc-k + .mc-k { margin-left: 16px; }
+/* 成员卡：年级/学校两行值（字段名已去除） */
+.mc-meta .mc-v,
+.mc-meta .mc-todo { display: block; }
+.mc-meta .mc-v + .mc-v,
+.mc-meta .mc-todo + .mc-todo { margin-top: 5px; }
 .mc-todo { color: var(--ink-3); opacity: 0.7; }
 .mc-dir {
   margin-top: 7px;

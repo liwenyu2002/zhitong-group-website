@@ -11,7 +11,7 @@
     "首页": "Home",
     "课题组": "Group",
     "研究": "Research",
-    "论文": "Publications",
+    "成果": "Achievements",
     "加入我们": "Join Us",
 
     /* 首页 */
@@ -79,8 +79,6 @@
     "Ⅴ EEG 辅助诊断": "Ⅴ EEG-Aided Diagnosis",
     "Ⅵ 类脑智能": "Ⅵ Brain-Inspired Intelligence",
     "Ⅶ 眼电交互": "Ⅶ EOG Interaction",
-    "Ⅴ 方向三人协同 · PI 横跨 Ⅰ/Ⅱ/Ⅲ —— 一人多向，多向一人。":
-      "Three people share direction Ⅴ; the PI spans Ⅰ/Ⅱ/Ⅲ — one person, many directions; one direction, many people.",
     "点击顶部导航换页": "Switch pages from the top navigation",
 
     /* 课题组 */
@@ -120,9 +118,42 @@
     "国家奖学金": "National Scholarship",
 
     /* 研究 */
-    "RESEARCH · 研究方向与项目负责人": "RESEARCH · DIRECTIONS & LEADS",
-    "从一个电极，<br>延伸到每一项<mark>具体工作</mark>":
-      "From one electrode,<br>to every <mark>concrete piece of work</mark>",
+    "RESEARCH · 研究方向": "RESEARCH · RESEARCH DIRECTIONS",
+    "构建植入式与穿戴式脑机接口的完整链路：从高通量柔性电极阵列、低噪声前端，到在体长期稳定记录与实时解码闭环。全聚合物神经电极正在开展慢性在体记录（<i>Nature</i> 投稿），定制化 3D 植入电极用于匹配神经组织解剖（<i>Sci. Adv.</i> 投稿）。":
+      "The full chain of implantable and wearable BCIs: from high-density flexible electrode arrays and low-noise front-ends to chronic in-vivo recording and real-time decoding loops. An all-polymer neural electrode is now in chronic in-vivo recording (<i>Nature</i> submitted); a custom 3D implant electrode matches neural tissue anatomy (<i>Sci. Adv.</i> submitted).",
+    "自研 TransFlex 多臂可变刚度植入电极（TRANSDUCERS 2025），术中易植入、在体后柔软；并与合作单位推进多层皮层内探针等器件的工程化验证。":
+      "Our TransFlex multi-arm variable-stiffness implant electrode (TRANSDUCERS 2025) inserts easily during surgery yet turns soft in vivo; together with partner labs we are engineering multilayer intracortical probes.",
+    "FIG. R1 · 3D 神经电极微制造工艺": "FIG. R1 · 3D microfabrication of neural electrodes",
+    "研究电极与神经组织的界面工程——材料、结构与工艺的协同设计。VariDepth（VD-NEA）以立体掩膜实现任意电极深度（IEEE MEMS 2025 · 提名）；FlexConnect 提供柔性通用引出与键合界面（MicroTAS 2024 / JCK 2024）；环形微针阵列实现发上干电 EEG（IEEE MEMS 2021）。":
+      "Interface engineering between electrodes and neural tissue — materials, structures and fabrication designed together. VariDepth (VD-NEA) reaches arbitrary electrode depths via stereo masking (IEEE MEMS 2025, nominated); FlexConnect offers a flexible universal interconnect and bonding interface (MicroTAS 2024 / JCK 2024); ring microneedle arrays enable on-hair dry EEG (IEEE MEMS 2021).",
+    "最新工作 STAMA 可拉伸全聚合物微针阵列（IEEE MEMS 2027）：拉伸 47% 后电化学性能依然稳定，为低阻抗干式电生理记录提供新的材料路线。":
+      "Our latest work, STAMA — a stretchable all-polymer microneedle array (IEEE MEMS 2027) — keeps stable electrochemical performance after 47% stretch, opening a new materials route to low-impedance dry electrophysiology.",
+    "FIG. R2 · STAMA 可拉伸全聚合物微针阵列": "FIG. R2 · STAMA stretchable all-polymer microneedle array",
+    "贴着皮肤的柔性传感：把测量穿戴在身上。自研 128 通道超高密度无线脑电采集系统——64 通道压缩于 3×3 cm²、干电极、5 分钟内完成佩戴，通道密度为目前世界最高；硬件系统已搭建完毕，正在构建最高密度的 EEG 数据集。":
+      "Soft sensing worn on the body. Our self-built 128-channel ultra-high-density wireless EEG system packs 64 channels into 3×3 cm² with dry electrodes and under-5-minute setup — the highest channel density in the world; the hardware is complete and we are building the densest EEG dataset to date.",
+    "器件方向延续 FAICS 环形叉指电容传感（接近 / 压力，IEEE MEMS 2022）与铂基穿孔呼吸传感器（连续监测，Micromachines 2022），面向长期、无感的人体信号测量。":
+      "On the device side we continue with FAICS ring-interdigitated capacitive sensing (proximity / pressure, IEEE MEMS 2022) and a platinum perforated breathing sensor (continuous monitoring, Micromachines 2022), for long-term, invisible measurement of the body.",
+    "FIG. R3 · 128-CH 干电极无线采集系统": "FIG. R3 · 128-ch dry-electrode wireless EEG system",
+    "从头皮到皮层内：解码算法、脑基础模型与疾病辅助诊断。BrainSeg 把视觉语义分割引入 fMRI 神经表征研究，以密集语义解码探查类别特异性神经表征（ICLR 2027 筹备中）。":
+      "From scalp to intracortical signals: decoding algorithms, brain foundation models and disease-aided diagnosis. BrainSeg brings vision semantic segmentation into fMRI neural representation research, probing category-specific representations through dense semantic decoding (in preparation for ICLR 2027).",
+    "在中国脑机接口大赛中，基于感觉肌肉电刺激提示的上肢运动想象分类获两项二等奖；自研脑机接口数据采集平台支撑「挑战杯」参赛工作。":
+      "At the China BCI Competition, upper-limb motor-imagery classification cued by sensory muscle electrical stimulation won two second prizes; our self-built BCI data-collection platform supported the Challenge Cup entry.",
+    "FIG. R4 · 中国脑机接口大赛 · 二等奖 ×2": "FIG. R4 · China BCI Competition · 2nd Prize ×2",
+    "面向神经精神疾病的 EEG 辅助诊疗：EEG 基础模型的跨被试小样本提示微调（Training-free，AAAI 2027 在审）；情绪解码基础模型（GNN-Mamba 时空联合建模）；与宣武医院合作开展的基于高密度脑机接口的脑卒中辅助诊疗。":
+      "EEG-aided care for neuropsychiatric disorders: cross-subject few-shot prompt tuning of EEG foundation models (training-free, AAAI 2027 under review); an emotion-decoding foundation model (GNN-Mamba spatio-temporal modeling); and stroke-aided diagnosis on high-density BCIs with Xuanwu Hospital.",
+    "方法上强调「基础模型 + 临床约束」：抑制跨被试迁移中的灾难性遗忘，以标签去噪与置信度加权提升数据质量，并以多智能体协作模拟临床会诊流程，覆盖从筛查到鉴别的完整链路。":
+      "Method-wise we stress foundation models with clinical constraints: suppressing catastrophic forgetting in cross-subject transfer, improving data quality via label denoising and confidence weighting, and simulating clinical consultations with multi-agent collaboration — from screening to differential diagnosis.",
+    "FIG. R5 · 脑卒中辅助诊疗（宣武医院合作）": "FIG. R5 · Stroke-aided diagnosis (Xuanwu Hospital)",
+    "脉冲神经网络的在线学习：在 Spiking Transformer 上集成 OTTT、BrainTrace、SLTT 等在线学习算法，刻画跨时间步的梯度相似性，并设计新一代 Attention 架构，消除 spike×spike 算子带来的梯度不稳定。":
+      "Online learning for spiking networks: we integrate OTTT, BrainTrace and SLTT into Spiking Transformers, characterize cross-timestep gradient similarity, and design a new attention architecture that removes gradient instability from spike×spike operators.",
+    "面向 BCI 长期闭环使用的跨天解码与硬件漂移问题，让网络在稀疏、低功耗约束下持续适应信号变化；同期建设 Meta Research——AI 自主科研共生平台，以元循环与主动人机协同支撑长期研究。":
+      "Toward day-across decoding and hardware drift in long-term closed-loop BCI, we keep networks adapting under sparsity and low-power budgets; in parallel we build Meta Research, an AI-autonomous-research platform driven by meta-cycles and proactive human-machine collaboration.",
+    "FIG. R6 · 新一代 Spiking Transformer 架构": "FIG. R6 · Next-gen Spiking Transformer architecture",
+    "仅双通道眼电（EOG）的实时交互：ACED 自适应因果检测架构实现 6 分类手势指令，跨佩戴准确率 81.7%，延迟 668–940 ms，CPU 1.2 ms/跳（200 ms 节拍下 160 倍算力余量）。":
+      "Real-time interaction on just two EOG channels: the ACED adaptive causal-detection architecture delivers 6-class gesture commands with 81.7% cross-wear accuracy, 668–940 ms latency and 1.2 ms of CPU per 200 ms tick — a 160× compute margin.",
+    "核心创新是把先验逻辑交给模型学习——将自然场景下的基线漂移建模为信号一并输入网络，佩戴内分类准确率明显提升（ICLR 2027 筹备中）。":
+      "The key idea is to hand prior logic to the model: baseline drift in natural scenes is modeled as a signal fed into the network, clearly lifting within-wear accuracy (in preparation for ICLR 2027).",
+    "FIG. R7 · 双通道眼电交互：免手控定位": "FIG. R7 · Two-channel EOG interaction, hands-free",
     "脑机接口系统": "BCI Systems",
     "构建植入式与穿戴式脑机接口系统：从高通量柔性电极阵列、低噪声前端，到在体长期稳定记录与实时解码闭环。":
       "Building implantable and wearable BCI systems: high-throughput flexible electrode arrays, low-noise front-ends, long-term stable in-vivo recording and real-time closed-loop decoding.",
@@ -193,8 +224,14 @@
     "延迟 668–940 ms · 200ms 节拍 160 倍算力余量": "Latency 668–940 ms · 200 ms cadence · 160× compute headroom",
 
     /* 论文 */
-    "PUBLICATIONS · 论文": "PUBLICATIONS",
-    "代表性论文与会议": "Selected Publications & Conferences",
+    "ACHIEVEMENTS · 成果": "ACHIEVEMENTS",
+        "代表性成果": "Representative Achievements",
+    
+    "通讯作者": "corresponding author",
+    "<i>IEDM 2026</i> · 通讯作者": "<i>IEDM 2026</i> · corresponding author",
+    "<i>IEEE MEMS 2027</i> · 通讯作者": "<i>IEEE MEMS 2027</i> · corresponding author",
+    "<i>Nature</i> · 通讯作者": "<i>Nature</i> · corresponding author",
+    "<i>Science Advances</i> · 通讯作者": "<i>Science Advances</i> · corresponding author",
     "<i>IEDM 2026</i> · ACCEPTED · 北京中关村学院首次": "<i>IEDM 2026</i> · ACCEPTED · a first for BZA",
     "<i>IEEE MEMS 2027</i> · UNDER REVIEW · 通讯作者": "<i>IEEE MEMS 2027</i> · UNDER REVIEW · corresponding author",
     "基于新被试小样本支持集的参数高效提示微调 —— EEG 基础模型跨被试适配":
