@@ -52,8 +52,9 @@
     const step = () => {
       if (g !== gen) return;
       try {
-        pos = lerp(pos, target, 0.1);
+        pos = lerp(pos, target, 0.17);
         paint();
+        paintGrain();
       } catch (e) { /* 下帧重试 */ }
       if (Math.abs(target - pos) < 0.0015) {
         pos = target; paint();
@@ -68,15 +69,26 @@
       const settled = Math.abs(target - pos) < 0.0015;
       const timedOut = performance.now() - t0 > 1200;   // 节流环境下直接落位
       if (settled || timedOut) {
-        pos = target; paint();
+        pos = target; paint(); paintGrain();
         window.__deckProgress = N > 1 ? clamp(pos / (N - 1), 0, 1) : 0;
         clearInterval(fb);
         return;
       }
-      pos = lerp(pos, target, 0.1);
-      paint();
+      pos = lerp(pos, target, 0.17);
+      paint(); paintGrain();
     }, 50);
   }
+
+  /* 纸张蒙版：横向随轨道、纵向随页内滚动（512 取模保持图案连续） */
+  const grain = document.getElementById("grain");
+  function paintGrain() {
+    if (!grain) return;
+    const act = slides[idx];
+    const sy = act ? act.scrollTop : 0;
+    const hx = pos * innerWidth % 512;
+    grain.style.transform = "translate3d(" + (-hx) + "px," + (-(sy % 512)) + "px,0)";
+  }
+  slides.forEach(s => s.addEventListener("scroll", paintGrain, { passive: true }));
 
   /* 锚点原生滚动会顶偏 html.scrollLeft，统一归零 */
   function resetNativeScroll() {
@@ -87,8 +99,10 @@
   function go(i) {
     i = clamp(i, 0, N - 1);
     idx = i;
+    window.__deckIdx = i;
     target = i;
     resetNativeScroll();
+    paintGrain();
     if (reduced) { pos = target; paint(); render(); return; }
     gen++;
     animTo(gen);
@@ -98,6 +112,7 @@
   /* 导航栏与页内跳转链接（核心换页方式） */
   document.querySelectorAll("a[data-goto]").forEach(a => {
     a.addEventListener("click", e => {
+      if (a.classList.contains("amp-btn")) return;   // 放大器：先翻面发射，再由 amp.js 换页
       e.preventDefault();
       const i = indexOfId(a.dataset.goto);
       if (i >= 0) go(i);
@@ -136,9 +151,17 @@
     resetNativeScroll();
   });
 
+  window.__deckGo = go;
+  window.__deckIdxGet = () => idx;
+  window.__deckIndexOfId = indexOfId;
+
+  /* 蒙版跟踪兜底巡检 */
+  setInterval(() => { try { paintGrain(); } catch (e) {} }, 400);
+
   /* 启动 */
   const start = indexOfId(location.hash.slice(1));
   idx = start >= 0 ? start : 0;
+  window.__deckIdx = idx;
   pos = target = idx;
   resetNativeScroll();
   paint();

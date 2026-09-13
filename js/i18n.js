@@ -18,7 +18,48 @@
     "北京中关村学院 · 张致同课题组": "Beijing Zhongguancun Academy · Zhang Zhitong Lab",
     "NeuroDiagAI —— 神经精神疾病 EEG 辅助诊断：<br>128 通道超高密度无线脑电 · 自建 1.6w 条运动想象数据集 · 脑基础模型。人体的一切，都是信号。":
       "NeuroDiagAI — EEG-aided diagnosis of neuropsychiatric disorders:<br>128-ch ultra-high-density wireless EEG · a 16k-trial motor-imagery dataset · brain foundation models. Everything human is signal.",
-    "查看研究方向 →": "Explore Research →",
+    "研究方向": "RESEARCH",
+
+    /* 成员页 */
+    "成员": "Members",
+    "MEMBERS · 成员": "MEMBERS",
+    "同路人，<br>在这里<mark>集合</mark>。": "Fellow travelers —<br><mark>assemble</mark> here.",
+    "把信号当语言的，不止一个人。照片、年级、来处与方向——一页看全。":
+      "More than one of us speaks in signals. Photos, cohorts, origins and directions — all on one page.",
+    "年级": "Cohort",
+    "原高校": "Alma mater",
+    "待补": "TBD",
+    "博士": "PhD",
+    "硕士": "M.Sc.",
+    "张致同 PI": "Zhitong Zhang (PI)",
+    "李文宇": "Wenyu Li",
+    "王君逸": "Junyi Wang",
+    "刘丽华": "Lihua Liu",
+    "孙钰晓": "Yuxiao Sun",
+    "刘鼎坤": "Dingkun Liu",
+    "沈思成": "Sicheng Shen",
+    "马晓猛": "Xiaomeng Ma",
+    "北京航空航天大学": "Beihang University",
+    "Ⅰ/Ⅱ/Ⅲ · 全链条脑机接口 · 信号放大器与神经界面":
+      "Ⅰ/Ⅱ/Ⅲ · Full-stack BCI · signal amplifiers and neural interfaces",
+    "Ⅶ · 眼电交互与可穿戴神经接口": "Ⅶ · EOG interaction & wearable neural interfaces",
+    "Ⅴ · EEG 基础模型与跨被试适配": "Ⅴ · EEG foundation models & cross-subject adaptation",
+    "Ⅴ · 情绪脑机接口 · GNN-Mamba": "Ⅴ · Emotion BCI · GNN-Mamba",
+    "Ⅴ · 脑卒中辅助诊疗 · 多智能体": "Ⅴ · Stroke-aided diagnosis · multi-agent",
+    "Ⅳ · 脑电解码与多模态大模型": "Ⅳ · EEG decoding & multimodal foundation models",
+    "Ⅵ · 类脑在线学习 · Spiking Transformer": "Ⅵ · Brain-inspired online learning · Spiking Transformer",
+    "Ⅵ · AI 自主科研 · Meta Research": "Ⅵ · AI-autonomous research · Meta Research",
+    "人员课题图谱 <em>MEMBER × TOPIC MAP</em>": "MEMBER × TOPIC MAP",
+    "张致同 PI": "Zhitong Zhang (PI)",
+    "Ⅰ 脑机接口系统": "Ⅰ BCI Systems",
+    "Ⅱ 神经电子界面": "Ⅱ Neural Interfaces",
+    "Ⅲ 可穿戴传感": "Ⅲ Wearable Sensing",
+    "Ⅳ 脑电解码与大模型": "Ⅳ Decoding & Foundation Models",
+    "Ⅴ EEG 辅助诊断": "Ⅴ EEG-Aided Diagnosis",
+    "Ⅵ 类脑智能": "Ⅵ Brain-Inspired Intelligence",
+    "Ⅶ 眼电交互": "Ⅶ EOG Interaction",
+    "Ⅴ 方向三人协同 · PI 横跨 Ⅰ/Ⅱ/Ⅲ —— 一人多向，多向一人。":
+      "Three people share direction Ⅴ; the PI spans Ⅰ/Ⅱ/Ⅲ — one person, many directions; one direction, many people.",
     "点击顶部导航换页": "Switch pages from the top navigation",
 
     /* 课题组 */
@@ -155,7 +196,7 @@
 
   const norm = s => s.replace(/\s+/g, " ").trim();
   const hasCJK = s => /[\u4e00-\u9fff]/.test(s);
-  const SEL = "#deck h1, #deck h2, #deck h3, #deck p, #deck li, #deck span, #deck dt, #deck dd, #deck a, #deck figcaption, .topnav a";
+  const SEL = "#deck h1, #deck h2, #deck h3, #deck p, #deck li, #deck span, #deck dt, #deck dd, #deck a, #deck b, #deck figcaption, #deck .news-head, .topnav a";
   const memo = new Map();     // el -> 中文原稿
   let lang = localStorage.getItem("zlab-lang") || "zh";
 

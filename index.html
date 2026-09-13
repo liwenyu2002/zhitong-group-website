@@ -6,20 +6,22 @@
 <title>Zhang Lab · 脑机接口课题组 · 北京中关村学院</title>
 <meta name="description" content="Zhang Lab —— 张致同课题组的脑机接口研究：神经电极、可穿戴传感、脑电解码与脑机大模型。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23171717'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%237dff9a' font-family='monospace'>&gt;_</text></svg>">
-<link rel="stylesheet" href="css/style.css?v=35">
+<link rel="stylesheet" href="css/style.css?v=52">
 </head>
 <body>
 
 <!-- 背景：点阵大脑（随换页显现） -->
 <canvas id="bgBrain" aria-hidden="true"></canvas>
 
-<div id="grain" aria-hidden="true"></div>
+
 
 <nav class="topnav" aria-label="站点导航">
-  <a href="#hero" data-goto="hero">首页</a><a href="#group" data-goto="group">课题组</a><a href="#pi" data-goto="pi">PI</a><a href="#research" data-goto="research">研究</a><a href="#publications" data-goto="publications">论文</a><a class="nav-cta" href="#join" data-goto="join">加入我们</a>
+  <a href="#hero" data-goto="hero">首页</a><a href="#group" data-goto="group">课题组</a><a href="#pi" data-goto="pi">PI</a><a href="#members" data-goto="members">成员</a><a href="#research" data-goto="research">研究</a><a href="#publications" data-goto="publications">论文</a><a class="nav-cta" href="#join" data-goto="join">加入我们</a>
 </nav>
 
 <!-- ============ 页面轨道：点导航栏左右换页 ============ -->
+<div id="grain" aria-hidden="true"></div>
+
 <main id="deck" aria-live="polite">
 
   <!-- 首屏 -->
@@ -29,10 +31,16 @@
       <h1 class="lab-title">Zhang <em>Lab</em></h1>
       <p class="hero-sub">NeuroDiagAI —— 神经精神疾病 EEG 辅助诊断：<br>128 通道超高密度无线脑电 · 自建 1.6w 条运动想象数据集 · 脑基础模型。人体的一切，都是信号。</p>
       <div class="hero-actions">
-        <a class="btn-crt" href="#research" data-goto="research">查看研究方向 →</a>
+        <div class="amp-wrap">
+          <a class="amp-btn" href="#research" data-goto="research" aria-label="查看研究方向——信号放大器">
+            <span class="amp-flip">
+              <span class="amp-face amp-front"><b class="amp-mid">研究方向</b><i class="amp-tag">ZL·128</i></span>
+              <span class="amp-face amp-back"></span>
+            </span>
+          </a>
+        </div>
         <a class="btn-wire" href="#join" data-goto="join">加入我们</a>
       </div>
-      <p class="deck-hint">点击顶部导航换页</p>
     </div>
 
     <div class="device-stack booting" id="deviceStack" aria-hidden="true">
@@ -138,7 +146,101 @@
     </section>
   </section>
 
-  <!-- 研究（设备带 + 七个方向） -->
+  <!-- ============ 成员 ============ -->
+  <section class="slide" id="members">
+    <section class="chapter">
+      <div class="sec-head" data-reveal>
+        <span class="sec-no">03</span>
+        <span class="sec-label">MEMBERS · 成员</span>
+      </div>
+      <h2 class="sec-title" data-reveal>同路人，<br>在这里<mark>集合</mark>。</h2>
+      <p class="lead" data-reveal>把信号当语言的，不止一个人。照片、年级、来处与方向——一页看全。</p>
+
+      <div class="member-grid">
+        <div class="member-card" data-reveal>
+          <span class="ph-tile ph-photo"><img src="img/pi.png?v=1" alt="张致同"></span>
+          <div class="mc-info">
+            <h3>张致同 <span class="mc-role">PI</span></h3>
+            <p class="mc-meta"><span class="mc-k">年级</span>2020 博士 <span class="mc-k">原高校</span>北京航空航天大学</p>
+            <p class="mc-dir">Ⅰ/Ⅱ/Ⅲ · 全链条脑机接口 · 信号放大器与神经界面</p>
+          </div>
+        </div>
+
+        <div class="member-card" data-reveal>
+          <!-- 照片占位：替换为 <img src="img/members/xxx.jpg"> -->
+          <span class="ph-tile">李</span>
+          <div class="mc-info">
+            <h3>李文宇 <span class="mc-role">硕士</span></h3>
+            <p class="mc-meta"><span class="mc-k">年级</span><span class="mc-todo">待补</span> <span class="mc-k">原高校</span><span class="mc-todo">待补</span></p>
+            <p class="mc-dir">Ⅶ · 眼电交互与可穿戴神经接口</p>
+          </div>
+        </div>
+
+        <div class="member-card" data-reveal>
+          <span class="ph-tile">王</span>
+          <div class="mc-info">
+            <h3>王君逸 <span class="mc-role">博士</span></h3>
+            <p class="mc-meta"><span class="mc-k">年级</span><span class="mc-todo">待补</span> <span class="mc-k">原高校</span><span class="mc-todo">待补</span></p>
+            <p class="mc-dir">Ⅴ · EEG 基础模型与跨被试适配</p>
+          </div>
+        </div>
+
+        <div class="member-card" data-reveal>
+          <span class="ph-tile">刘</span>
+          <div class="mc-info">
+            <h3>刘丽华 <span class="mc-role">硕士</span></h3>
+            <p class="mc-meta"><span class="mc-k">年级</span><span class="mc-todo">待补</span> <span class="mc-k">原高校</span><span class="mc-todo">待补</span></p>
+            <p class="mc-dir">Ⅴ · 情绪脑机接口 · GNN-Mamba</p>
+          </div>
+        </div>
+
+        <div class="member-card" data-reveal>
+          <span class="ph-tile">孙</span>
+          <div class="mc-info">
+            <h3>孙钰晓 <span class="mc-role">硕士</span></h3>
+            <p class="mc-meta"><span class="mc-k">年级</span><span class="mc-todo">待补</span> <span class="mc-k">原高校</span><span class="mc-todo">待补</span></p>
+            <p class="mc-dir">Ⅴ · 脑卒中辅助诊疗 · 多智能体</p>
+          </div>
+        </div>
+
+        <div class="member-card" data-reveal>
+          <span class="ph-tile">刘</span>
+          <div class="mc-info">
+            <h3>刘鼎坤 <span class="mc-role">硕士</span></h3>
+            <p class="mc-meta"><span class="mc-k">年级</span><span class="mc-todo">待补</span> <span class="mc-k">原高校</span><span class="mc-todo">待补</span></p>
+            <p class="mc-dir">Ⅳ · 脑电解码与多模态大模型</p>
+          </div>
+        </div>
+
+        <div class="member-card" data-reveal>
+          <span class="ph-tile">沈</span>
+          <div class="mc-info">
+            <h3>沈思成 <span class="mc-role">硕士</span></h3>
+            <p class="mc-meta"><span class="mc-k">年级</span><span class="mc-todo">待补</span> <span class="mc-k">原高校</span><span class="mc-todo">待补</span></p>
+            <p class="mc-dir">Ⅵ · 类脑在线学习 · Spiking Transformer</p>
+          </div>
+        </div>
+
+        <div class="member-card" data-reveal>
+          <span class="ph-tile">马</span>
+          <div class="mc-info">
+            <h3>马晓猛 <span class="mc-role">硕士</span></h3>
+            <p class="mc-meta"><span class="mc-k">年级</span><span class="mc-todo">待补</span> <span class="mc-k">原高校</span><span class="mc-todo">待补</span></p>
+            <p class="mc-dir">Ⅵ · AI 自主科研 · Meta Research</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 人员课题图谱 -->
+      <div class="map-wrap" data-reveal>
+        <div class="map-cap">人员课题图谱 <em>MEMBER × TOPIC MAP</em></div>
+        <canvas id="mapCanvas" aria-label="人员课题图谱"></canvas>
+        <p class="map-note">Ⅴ 方向三人协同 · PI 横跨 Ⅰ/Ⅱ/Ⅲ —— 一人多向，多向一人。</p>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============ 研究 ============ -->
   <section class="slide" id="research">
     <div class="marquee-plate" aria-hidden="true">
       <div class="marquee-track">
@@ -325,8 +427,10 @@
 </main>
 
 
-<script src="js/app.js?v=24"></script>
-<script src="js/deck.js?v=5"></script>
-<script src="js/i18n.js?v=4"></script>
+<script src="js/app.js?v=26"></script>
+<script src="js/deck.js?v=11"></script>
+<script src="js/amp.js?v=12"></script>
+<script src="js/map.js?v=8"></script>
+<script src="js/i18n.js?v=8"></script>
 </body>
 </html>

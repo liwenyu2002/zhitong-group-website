@@ -913,9 +913,13 @@
     const cs = document.getElementById('cvHyper');
     const cp = document.getElementById('cvPulse');
     const cpl = document.getElementById('cvPatch');
-    if (cs) draws.push(hyperscanLoop(cs));
-    if (cp) draws.push(pulseLoop(cp));
-    if (cpl) draws.push(patchLoop(cpl));
+    const heroOnly = fn => dt => {
+      if ((window.__deckIdx || 0) !== 0) return;   // 离开首页时四台设备不画
+      fn(dt);
+    };
+    if (cs) draws.push(heroOnly(hyperscanLoop(cs)));
+    if (cp) draws.push(heroOnly(pulseLoop(cp)));
+    if (cpl) draws.push(heroOnly(patchLoop(cpl)));
     draws.push(initBrainBg());
     initEmo();
     bootSeq();
@@ -942,24 +946,26 @@
     }
 
     let last = 0, rafAlive = false;
-    const grain = document.getElementById('grain');
-    let lastSy = -1;
+    const drawErrs = {};
     function frame(now) {
       rafAlive = true;
       requestAnimationFrame(frame);
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
-      if (grain) {
-        const sy = window.scrollY | 0;
-        if (sy !== lastSy) {
-          lastSy = sy;
-          grain.style.transform = 'translate3d(0,' + (-(sy % 512)) + 'px,0)';
+      for (let di = draws.length - 1; di >= 0; di--) {
+        try {
+          draws[di](dt);
+        } catch (e) {
+          drawErrs[di] = (drawErrs[di] || 0) + 1;
+          window.__frameErrCount = (window.__frameErrCount || 0) + 1;
+          // 错误日志封顶，防止无限拼接拖垮主线程
+          window.__frameErr = ('' + window.__frameErr).slice(-1200)
+            + '\n[draw ' + di + ' x' + drawErrs[di] + '] ' + e.message;
+          if (drawErrs[di] >= 40) {              // 连续出错：该绘制下岗隔离
+            draws.splice(di, 1);
+            window.__frameErr += '\n[draw ' + di + ' quarantined]';
+          }
         }
-      }
-      try {
-        draws.forEach(d => d(dt));
-      } catch (e) {
-        window.__frameErr = (window.__frameErr || '') + e.message + '\n';
       }
     }
     if (reduceMotion) {
