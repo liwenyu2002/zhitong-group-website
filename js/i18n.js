@@ -64,6 +64,7 @@
     "中国科学院自动化研究所": "Institute of Automation, CAS",
     "华东师范大学": "East China Normal University",
     "东南大学": "Southeast University",
+    "中山大学": "Sun Yat-sen University",
     "帮你想出不一样的点子": "Helps you come up with delightfully different ideas",
     "彩蛋": "Easter Eggs",
     "人员课题图谱": "Member\u2013Topic Map",
