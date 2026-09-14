@@ -485,6 +485,19 @@
         })()
       }))
     }));
+    // 分页吸引场：PI 页=轮播图左缘；research 页=视口中线最近的配图左缘
+    function makeParts(n) {
+      return Array.from({ length: n }, () => ({
+        p: Math.random(), spd: 0.24 + Math.random() * 0.26,
+        seed: Math.random() * 6.28, sz: 2.4 + Math.random() * 2.2,
+        bow: (Math.random() - 0.5) * 120, sx0: 0, sy0: 0, born: false,
+        hue: (() => { const lit = 0.4 + Math.random() * 0.6;
+          return [Math.round(31 + 175 * lit), Math.round(30 + 92 * lit), Math.round(27 + 45 * lit)]; })()
+      }));
+    }
+    const slideIdx = id => Array.from(document.querySelectorAll('#deck > section.slide')).indexOf(document.getElementById(id));
+    const mq = { el: document.querySelector('.pi-toprow .marquee-plate'), hasA: false, ax: 0, ay: 0, lax: 0, lay: 0, phase: Math.random() * 6.28, face: [], parts: makeParts(7) };
+    const rq = { hasA: false, ax: 0, ay: 0, sax: null, say: null, lax: 0, lay: 0, phase: Math.random() * 6.28, face: [], parts: makeParts(7) };
     return function draw(dt) {
       if ((++bgTick & 1) !== 0) return;  // 隔帧渲染，背景层省一半开销
       const dpr = Math.min(devicePixelRatio || 1, 1.5);
@@ -549,6 +562,53 @@
             if ((d.x - 60) * uxx + (d.y - 48) * uyy > mxp * 0.35) fl.face.push(d);
           }
         }
+        // PI 页：锚点钉在轮播图左缘中点
+        mq.hasA = false;
+        if (mq.el && window.__deckIdx === 2) {
+          const r = mq.el.getBoundingClientRect();
+          if (r.width && r.height) {
+            mq.ax = r.left - 12;
+            mq.ay = r.top + r.height * 0.52;
+            const adx = mq.ax - cx, ady = mq.ay - cy;
+            mq.lax = adx * cAr - ady * sAr;
+            mq.lay = adx * sAr + ady * cAr;
+            mq.hasA = true;
+            const dl0 = Math.hypot(adx, ady) || 1;
+            const uxx = adx / dl0, uyy = ady / dl0;
+            let mxp = -9;
+            for (const d of dots) { if (d.rank > 1) continue; const sp = (d.x - 60) * uxx + (d.y - 48) * uyy; if (sp > mxp) mxp = sp; }
+            mq.face.length = 0;
+            for (const d of dots) { if (d.rank > 1) continue; if ((d.x - 60) * uxx + (d.y - 48) * uyy > mxp * 0.35) mq.face.push(d); }
+          }
+        }
+        // research 页：锚点平滑跟随“视口中线最近”的配图左缘
+        rq.hasA = false;
+        if (window.__deckIdx === slideIdx('research')) {
+          const vcy = innerHeight * 0.5;
+          let best = null, bestD = 1e9;
+          document.querySelectorAll('#research .dir-fig').forEach(f => {
+            const r = f.getBoundingClientRect();
+            if (!r.width || !r.height) return;
+            const d = Math.abs(r.top + r.height / 2 - vcy);
+            if (d < bestD) { bestD = d; best = r; }
+          });
+          if (best) {
+            const tx = best.left - 12, ty = best.top + best.height * 0.5;
+            rq.sax = rq.sax == null ? tx : rq.sax + (tx - rq.sax) * 0.12;
+            rq.say = rq.say == null ? ty : rq.say + (ty - rq.say) * 0.12;
+            rq.ax = rq.sax; rq.ay = rq.say;
+            const adx = rq.ax - cx, ady = rq.ay - cy;
+            rq.lax = adx * cAr - ady * sAr;
+            rq.lay = adx * sAr + ady * cAr;
+            rq.hasA = true;
+            const dl0 = Math.hypot(adx, ady) || 1;
+            const uxx = adx / dl0, uyy = ady / dl0;
+            let mxp = -9;
+            for (const d of dots) { if (d.rank > 1) continue; const sp = (d.x - 60) * uxx + (d.y - 48) * uyy; if (sp > mxp) mxp = sp; }
+            rq.face.length = 0;
+            for (const d of dots) { if (d.rank > 1) continue; if ((d.x - 60) * uxx + (d.y - 48) * uyy > mxp * 0.35) rq.face.push(d); }
+          } else { rq.sax = rq.say = null; }
+        } else { rq.sax = rq.say = null; }
       }
       // 1) 布面 + 捏住一点往上拽的小揪揪（凸起中心平滑追踪鼠标）
       const mlen = Math.hypot(mx, my);
@@ -580,8 +640,11 @@
           - uy * inf * 2.2 * sc * 0.5
           + Math.cos(ny * 2.2 - t * 0.45 + nx * 1.2) * (10 + inf * 8)
           + Math.cos(t * 0.30 + nx) * (5 + inf * 4);
-        // 被四台设备扯住：朝向设备的边缘点周期性向外拉伸
-        for (const fl of flows) {
+        // 被设备/轮播扯住：朝向吸引点的边缘点周期性向外拉伸
+        let pullers = flows;
+        if (mq.hasA) pullers = pullers.concat([mq]);
+        if (rq.hasA) pullers = pullers.concat([rq]);
+        for (const fl of pullers) {
           if (!fl.hasA) continue;
           const vx = fl.lax - d.sx, vy = fl.lay - d.sy;
           const vd = Math.hypot(vx, vy) + 0.001;
@@ -715,43 +778,48 @@
           }
         }
       }
-      // ── 神经粒子流绘制：对应位置的点阵被设备自然吸走，无固定连线 ──
+      // ── 神经粒子流绘制：点阵被吸引自然吸走，无固定连线 ──
       if (!reduceMotion) {
         const flow = 1 - sstep(0.012, 0.075, smooth);
-        if (flow > 0.02) {
-          for (const fl of flows) {
-            if (!fl.hasA || !fl.face.length) continue;
-            const lx = fl.lax, ly = fl.lay;
-            for (const c of fl.parts) {
-              c.p += dtc * c.spd * (0.8 + 0.2 * Math.sin(t * 0.5 + c.seed));
-              if (c.p >= 1) { c.p = 0; c.born = false; }
-              if (!c.born) {
-                const d = fl.face[(Math.random() * fl.face.length) | 0];
-                c.sx0 = d.sx; c.sy0 = d.sy;
-                c.bow = (Math.random() - 0.5) * 130;
-                c.born = true;
-              }
-              const e = c.p * c.p * (3 - 2 * c.p);
-              const q = e, iq = 1 - q;
-              const mxp = (c.sx0 + lx) / 2, myp = (c.sy0 + ly) / 2;
-              const dl = Math.hypot(lx - c.sx0, ly - c.sy0) || 1;
-              const Cx = mxp - (ly - c.sy0) / dl * c.bow, Cy = myp + (lx - c.sx0) / dl * c.bow;
-              for (let tr = 0; tr < 4; tr++) {
-                const qq = q - tr * 0.03;
-                if (qq <= 0.01) continue;
-                const iq = 1 - qq;
-                const bx = iq * iq * c.sx0 + 2 * iq * qq * Cx + qq * qq * lx;
-                const by = iq * iq * c.sy0 + 2 * iq * qq * Cy + qq * qq * ly;
-                const wob = Math.sin(qq * 9 + c.seed) * 3.4 * Math.sin(Math.PI * qq);
-                const wxx = -(ly - c.sy0) / dl, wyy = (lx - c.sx0) / dl;
-                const al = Math.pow(Math.max(0, Math.sin(Math.PI * qq)), 0.8) * 0.6 * flow * (1 - tr * 0.3);
-                const sz = c.sz * (1 - tr * 0.2);
-                ctx.fillStyle = 'rgba(' + c.hue[0] + ',' + c.hue[1] + ',' + c.hue[2] + ',' + al.toFixed(3) + ')';
-                ctx.fillRect(bx + wxx * wob - sz / 2, by + wyy * wob - sz / 2, sz, sz);
-              }
+        function drawFlux(fl, amp) {
+          const lx = fl.lax, ly = fl.lay;
+          for (const c of fl.parts) {
+            c.p += dtc * c.spd * (0.8 + 0.2 * Math.sin(t * 0.5 + c.seed));
+            if (c.p >= 1) { c.p = 0; c.born = false; }
+            if (!c.born) {
+              const d = fl.face[(Math.random() * fl.face.length) | 0];
+              c.sx0 = d.sx; c.sy0 = d.sy;
+              c.bow = (Math.random() - 0.5) * 120;
+              c.born = true;
+            }
+            const e = c.p * c.p * (3 - 2 * c.p);
+            const q = e, iq = 1 - q;
+            const mxp = (c.sx0 + lx) / 2, myp = (c.sy0 + ly) / 2;
+            const dl = Math.hypot(lx - c.sx0, ly - c.sy0) || 1;
+            const Cx = mxp - (ly - c.sy0) / dl * c.bow, Cy = myp + (lx - c.sx0) / dl * c.bow;
+            for (let tr = 0; tr < 4; tr++) {
+              const qq = q - tr * 0.03;
+              if (qq <= 0.01) continue;
+              const iq = 1 - qq;
+              const bx = iq * iq * c.sx0 + 2 * iq * qq * Cx + qq * qq * lx;
+              const by = iq * iq * c.sy0 + 2 * iq * qq * Cy + qq * qq * ly;
+              const wob = Math.sin(qq * 9 + c.seed) * 3.4 * Math.sin(Math.PI * qq);
+              const wxx = -(ly - c.sy0) / dl, wyy = (lx - c.sx0) / dl;
+              const al = Math.pow(Math.max(0, Math.sin(Math.PI * qq)), 0.8) * amp * (1 - tr * 0.3);
+              const sz = c.sz * (1 - tr * 0.2);
+              ctx.fillStyle = 'rgba(' + c.hue[0] + ',' + c.hue[1] + ',' + c.hue[2] + ',' + al.toFixed(3) + ')';
+              ctx.fillRect(bx + wxx * wob - sz / 2, by + wyy * wob - sz / 2, sz, sz);
             }
           }
         }
+        if (flow > 0.02) {
+          for (const fl of flows) {
+            if (!fl.hasA || !fl.face.length) continue;
+            drawFlux(fl, 0.6 * flow);
+          }
+        }
+        if (window.__deckIdx === 2 && mq.hasA && mq.face.length) drawFlux(mq, 0.5);
+        if (window.__deckIdx === slideIdx('research') && rq.hasA && rq.face.length) drawFlux(rq, 0.5);
       }
       ctx.restore();
     };
