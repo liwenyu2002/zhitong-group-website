@@ -40,6 +40,7 @@
     "沈思成 <span class=\"mc-role\">博士</span>": "Sicheng Shen <span class=\"mc-role\">PhD</span>",
     "王奕诚 <span class=\"mc-role\">博士</span>": "Yicheng Wang <span class=\"mc-role\">PhD</span>",
     "马晓猛 <span class=\"mc-role\">博士</span>": "Xiaomeng Ma <span class=\"mc-role\">PhD</span>",
+    "李致远 <span class=\"mc-role\">博士</span>": "Zhiyuan Li <span class=\"mc-role\">PhD</span>",
     "2024 级": "Class of 2024",
     "2025 级": "Class of 2025",
     "2026 级": "Class of 2026",
