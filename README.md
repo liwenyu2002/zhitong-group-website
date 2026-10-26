@@ -15,3 +15,9 @@
 - **加入我们** — 招生与联系
 
 纯静态站点（HTML / CSS / Canvas，无第三方依赖），支持中英双语，经 GitHub Pages 部署，自定义域名见 `CNAME`。
+
+## 看见之外 · 序章
+
+预热页面位于 [`/beyond/`](https://www.zhitong-group.com/beyond/)，静态文件独立放在 `beyond/`，首页导航提供入口。页面沿用黑白抽象海报、隐喻短句和克制的滚动显现；不在页面披露产品类别或功能参数。
+
+修改 `main` 分支后按既有 GitHub Pages 流程发布。

@@ -9,6 +9,7 @@
   const DICT = {
     /* 导航 */
     "首页": "Home",
+    "看见之外": "Beyond the Visible",
     "课题组": "Group",
     "研究": "Research",
     "成果": "Achievements",
