@@ -29,6 +29,8 @@
       pending = 0;
       position = null;
       surface.classList.remove('motion-active');
+      surface.style.removeProperty('--layer-x');
+      surface.style.removeProperty('--layer-y');
       image.style.removeProperty('--drift-x');
       image.style.removeProperty('--drift-y');
     }
@@ -44,6 +46,8 @@
       };
       if (pending) return;
       pending = window.requestAnimationFrame(() => {
+        surface.style.setProperty('--layer-x', `${(position.x * distance).toFixed(2)}px`);
+        surface.style.setProperty('--layer-y', `${(position.y * distance * 0.6).toFixed(2)}px`);
         image.style.setProperty('--drift-x', `${(position.x * distance).toFixed(2)}px`);
         image.style.setProperty('--drift-y', `${(position.y * distance * 0.6).toFixed(2)}px`);
         pending = 0;
@@ -62,7 +66,7 @@
     motionTargets.push(reset);
   }
 
-  addMotion(document.querySelector('.hero'), document.querySelector('.hero-art img'), 12);
+  addMotion(document.querySelector('.hero'), document.querySelector('.hero-head'), 12);
   addMotion(document.querySelector('.afterglow'), document.querySelector('.afterglow-art img'), 9);
   document.querySelectorAll('.scene').forEach(surface => addMotion(surface, surface.querySelector('.scene-art img'), 10));
   document.querySelectorAll('.paired-scene').forEach(surface => addMotion(surface, surface.querySelector('.paired-art img'), 8));
@@ -80,6 +84,7 @@
       if (rect.bottom < 0 || rect.top > viewport) return;
       const progress = Math.max(-1, Math.min(1, (rect.top + rect.height / 2 - viewport / 2) / (viewport / 2 + rect.height / 2)));
       image.style.setProperty('--scroll-y', `${(progress * 14).toFixed(2)}px`);
+      surface.style.setProperty('--layer-scroll', `${(progress * 14).toFixed(2)}px`);
     });
   }
   function scheduleScroll() {
@@ -93,7 +98,7 @@
     reveals.forEach(element => element.classList.add('visible'));
     if (reduced.matches) {
       motionTargets.forEach(reset => reset());
-      scrollImages.forEach(({ image }) => image.style.removeProperty('--scroll-y'));
+      scrollImages.forEach(({ surface, image }) => { image.style.removeProperty('--scroll-y'); surface.style.removeProperty('--layer-scroll'); });
     } else {
       scheduleScroll();
     }
