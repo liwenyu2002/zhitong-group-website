@@ -14,3 +14,6 @@
 
 /* Dissolve detail imagery into the black field, keeping the center crisp. */
 .detail-art{position:relative}.detail-art::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#000 0%,#000 8%,transparent 25%,transparent 75%,#000 92%,#000 100%),linear-gradient(0deg,#000 0%,#000 8%,transparent 32%,transparent 84%,#000 100%)}
+
+/* The images flow directly into each other without a section heading. */
+.details-grid{margin-top:0}
