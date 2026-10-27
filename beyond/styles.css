@@ -17,3 +17,12 @@
 
 /* The images flow directly into each other without a section heading. */
 .details-grid{margin-top:0}
+
+/* Quiet typography: lighter strokes and room for each character. */
+body{font-family:"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif}
+h1,h2,h3{font-weight:300}
+.hero h1{letter-spacing:.12em}
+h2{letter-spacing:.11em}
+figcaption h3{font-weight:400;letter-spacing:.14em}
+.closing-copy h2{font-size:clamp(50px,6vw,88px);letter-spacing:.14em}
+@media(max-width:600px){.hero h1{letter-spacing:.1em}.closing-copy h2{font-size:54px}}
