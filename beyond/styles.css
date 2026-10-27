@@ -42,3 +42,12 @@ figcaption h3{font-weight:400;letter-spacing:.14em}
 body{font-family:"Teaser Kai","Songti SC","Noto Serif CJK SC","SimSun",serif}
 h1,h2,h3{font-weight:300}
 figcaption h3{font-weight:400}
+
+/* Subtle depth follows the visitor throughout the story. */
+@media(prefers-reduced-motion:no-preference){
+  .js .motion-image{transform:translate3d(var(--drift-x,0px),calc(var(--drift-y,0px) + var(--scroll-y,0px)),0);transition:transform .8s cubic-bezier(.2,.65,.3,1),filter .8s ease;will-change:transform}
+  .js .motion-active .motion-image{filter:brightness(1.15)}
+  .js .detail.motion-active .motion-image{filter:grayscale(1) brightness(1.15)}
+  .paired-copy h2,figcaption h3{transition:color .7s ease,transform .7s cubic-bezier(.2,.65,.3,1)}
+  .motion-active .paired-copy h2,.motion-active figcaption h3{color:#fff;transform:translateY(-3px)}
+}
