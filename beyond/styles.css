@@ -26,3 +26,19 @@ h2{letter-spacing:.11em}
 figcaption h3{font-weight:400;letter-spacing:.14em}
 .closing-copy h2{font-size:clamp(50px,6vw,88px);letter-spacing:.14em}
 @media(max-width:600px){.hero h1{letter-spacing:.1em}.closing-copy h2{font-size:54px}}
+
+/* Quiet, unhurried transitions; imagery responds only while it is being explored. */
+@media(prefers-reduced-motion:no-preference){
+  .js .reveal{transform:translateY(10px);transition:opacity 1.25s ease,transform 1.25s cubic-bezier(.2,.65,.3,1)}
+  .js .scene-art.reveal,.js .afterglow-art.reveal,.js .closing-art.reveal,.js .paired-scene.reveal{transform:none;transition:opacity 1.45s ease}
+  .js .reveal.visible{opacity:1;transform:none}
+  .js .section-copy.reveal,.js .afterglow-copy.reveal{transition-delay:.12s}
+  .js .hero-art img,.js .detail-art img{transform:translate3d(var(--drift-x,0px),var(--drift-y,0px),0);transition:transform .65s cubic-bezier(.2,.65,.3,1)}
+}
+
+/* WenKai GB display type, locally hosted. The web subset is named Teaser Kai. */
+@font-face{font-family:"Teaser Kai";src:url("assets/fonts/teaser-kai-light.woff2") format("woff2");font-style:normal;font-weight:300;font-display:swap}
+@font-face{font-family:"Teaser Kai";src:url("assets/fonts/teaser-kai-regular.woff2") format("woff2");font-style:normal;font-weight:400;font-display:swap}
+body{font-family:"Teaser Kai","Songti SC","Noto Serif CJK SC","SimSun",serif}
+h1,h2,h3{font-weight:300}
+figcaption h3{font-weight:400}

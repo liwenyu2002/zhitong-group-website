@@ -1,0 +1,5 @@
+Web typography source: LXGW WenKai GB v1.530, by LXGW and contributors.
+Official source: https://github.com/lxgw/LxgwWenKaiGB
+Source faces: LXGWWenKaiGB-Light.ttf and LXGWWenKaiGB-Regular.ttf.
+Web conversion: subset to GB2312 common glyphs and current page characters, convert to WOFF2; no glyph artwork was altered. Internal family renamed Teaser Kai for this web-only subset.
+License: SIL Open Font License 1.1; see OFL.txt. Original copyright and license records are retained in the font files.
