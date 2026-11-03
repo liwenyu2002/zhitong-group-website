@@ -93,3 +93,25 @@ figcaption h3{font-weight:400}
   .afterglow-art img{mask-image:linear-gradient(90deg,transparent 0%,#000 16%,#000 84%,transparent 100%),linear-gradient(0deg,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-composite:intersect;-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 16%,#000 84%,transparent 100%),linear-gradient(0deg,transparent 0%,#000 10%,#000 90%,transparent 100%);-webkit-mask-composite:source-in}
 }
 @media(max-width:900px){.afterglow-art{left:0}}
+
+/* A quiet window for the moments: the footage keeps its original color and sound. */
+.moments-carousel{width:min(100%,1020px);margin:clamp(28px,4vw,64px) auto 0;position:relative}
+.moments-window{overflow:hidden;aspect-ratio:16/9;background:#000}
+.moments-track{display:flex;width:100%;height:100%;transform:translate3d(0,0,0);transition:transform .8s cubic-bezier(.22,.6,.22,1)}
+.moments-slide{flex:0 0 100%;min-width:0;height:100%;background:#000}
+.moments-slide video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
+.moments-controls[hidden]{display:none}
+.moments-controls{display:grid;grid-template-columns:38px 1fr 38px;align-items:center;margin-top:14px;color:#aaa}
+.moments-controls button{appearance:none;border:0;background:none;color:inherit;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
+.moments-controls button:focus-visible{outline:1px solid #ddd;outline-offset:4px}
+.moments-play,.moments-sound{width:38px;height:38px;display:grid;place-items:center;transition:color .3s ease}
+.moments-controls button:hover{color:#fff}
+.moments-controls svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.moments-play .icon-pause,.moments-sound .icon-sound,.moments-play[aria-pressed="true"] .icon-play,.moments-sound[aria-pressed="true"] .icon-muted{display:none}
+.moments-play[aria-pressed="true"] .icon-pause,.moments-sound[aria-pressed="true"] .icon-sound{display:block}
+.moments-dots{display:flex;justify-content:center;align-items:center;gap:8px}
+.moments-dots button{width:24px;height:32px;display:grid;place-items:center}
+.moments-dots button::after{content:"";display:block;width:4px;height:4px;border-radius:50%;background:#555;transition:background .3s,transform .3s}
+.moments-dots button[aria-current="true"]::after{background:#ddd;transform:scale(1.3)}
+@media(max-width:600px){.moments-carousel{width:100%;margin-top:32px}.moments-controls{padding:0 var(--side)}}
+@media(prefers-reduced-motion:reduce){.moments-track{transition:none}}
