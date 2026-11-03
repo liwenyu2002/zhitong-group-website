@@ -85,7 +85,7 @@
         } catch (error) { settled = true; stop(); reject(error); }
       }, 50);
     });
-    frame.src = '/beyond/';
+    frame.src = window.entryDestination || '/beyond/';
     document.body.append(frame);
     try {
       // Release immediately; the first scene becomes visible when it is ready.
@@ -100,7 +100,7 @@
       frame.focus();
       setTimeout(() => { entry.remove(); frame.contentWindow.focus(); }, reduced.matches ? 0 : 750);
     } catch {
-      location.replace('/beyond/');
+      location.replace(window.entryDestination || '/beyond/');
     }
   }
 
@@ -114,6 +114,11 @@
     form.setAttribute('aria-busy', 'true');
     entry.classList.add('is-checking');
     try {
+      if (typeof window.entryAuthenticate === 'function') {
+        if (window.entryAuthenticate(input.value)) { await enter(); return; }
+        refuse('密令有误，请重试。');
+        return;
+      }
       const response = await fetch('/_entry/unlock', {
         method: 'POST', credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },

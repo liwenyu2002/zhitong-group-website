@@ -1,4 +1,4 @@
-"""Build the public group site without publishing the protected teaser assets."""
+"""Build the group website with its temporary client-side teaser gate."""
 from pathlib import Path
 import shutil
 import sys
@@ -19,8 +19,16 @@ if certificate_challenge.is_file():
     challenge_directory = destination / '.well-known/pki-validation'
     challenge_directory.mkdir(parents=True, exist_ok=True)
     shutil.copy2(certificate_challenge, challenge_directory / 'fileauth.txt')
-(destination / 'beyond').mkdir()
-shutil.copy2(root / 'deployment/beyond-redirect.html', destination / 'beyond/index.html')
+shutil.copytree(root / 'beyond', destination / 'beyond')
+(destination / 'beyond/index.html').rename(destination / 'beyond/site.html')
+entry = root / 'deployment/gate/public'
+shutil.copytree(entry, destination / '_entry')
+shutil.copy2(root / 'deployment/gate/static-auth.js', destination / '_entry/static-auth.js')
+gate = (entry / 'entry.html').read_text()
+script = '  <script src="/_entry/entry.js?v=flow5" defer></script>'
+if script not in gate:
+    raise SystemExit('Entry script insertion point was not found.')
+gate = gate.replace(script, '  <script src="/_entry/static-auth.js?v=20261104" defer></script>\n' + script)
+(destination / 'beyond/index.html').write_text(gate)
 (destination / '.nojekyll').touch()
-assert list((destination / 'beyond').rglob('*')) == [destination / 'beyond/index.html']
-print('Public group site prepared; /beyond/ contains only the protected-entry redirect.')
+print('Public group site prepared with the temporary client-side teaser gate.')

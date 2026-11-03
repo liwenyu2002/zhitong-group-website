@@ -20,11 +20,11 @@
 
 预热页面位于 [`/beyond/`](https://www.zhitong-group.com/beyond/)，静态文件独立放在 `beyond/`，首页导航提供入口。页面沿用黑白抽象海报、隐喻短句和滚动显现，以一台持续显示的手机串联「今日、家居、记忆、Agent」四个可交互页面。手机随滚动切页，记忆图谱淡入；家居和高光视频与顶部通知同步，高光视频可在记忆页回看。App 内的人物、指标和设备联动均为演示数据，不连接实际设备。
 
-`/beyond/` 在同一域名下由服务器验证密令，网页和视频请求经过会话校验。入口使用点阵眼睛和粒子输入流；验证成功后，粒子立即散开，页面在后台加载。密令验证器保存在服务器的私有文件中，不进入 Git、前端资源或公开发布产物。
+`/beyond/` 暂时使用前端密令入口。入口使用点阵眼睛和粒子输入流；验证成功后，粒子立即散开，页面在后台加载。此方案只用于临时展示：密令可从网页源码中找到，内容也可通过直接地址访问，不能用于保密。
 
-`beyond/` 保留预热内容的源码；网站服务从此仓库读取主站与预热素材。GitHub Pages 作为旧 DNS 缓存的过渡页，`deployment/build-pages.py` 排除预热资源和服务端代码。此仓库是公开仓库，仓库中的预热素材及历史版本仍可直接访问。
+`beyond/` 保留预热内容的源码；`deployment/build-pages.py` 将主站、前端密令入口与预热素材打包发布到 GitHub Pages。此仓库是公开仓库，仓库中的预热素材及历史版本可直接访问。
 
-服务端网关的源码镜像位于 `deployment/site-worker/`，粒子入口资源位于 `deployment/gate/public/`。密令和会话签名密钥通过网站托管的秘密变量 `PMSG_PASSWORD`、`PMSG_SESSION_SECRET` 配置，不写入仓库或前端。验证和会话签名均在网站服务端完成，会话采用 Secure、HttpOnly、SameSite cookie。
+粒子入口资源位于 `deployment/gate/public/`，临时密令配置位于 `deployment/gate/static-auth.js`。备用服务端网关源码保留在 `deployment/site-worker/`。
 
 腾讯云 EdgeOne Makers 的构建脚本为 `deployment/edgeone/build.py`。执行 `python3 deployment/edgeone/build.py /tmp/zhitong-edgeone /tmp/zhitong-edgeone.zip` 可生成直接上传包；密令和签名密钥仍需在托管服务端配置。
 
