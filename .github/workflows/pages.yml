@@ -24,6 +24,7 @@ jobs:
       - uses: actions/upload-pages-artifact@v4
         with:
           path: ${{ runner.temp }}/zhitong-public
+          include-hidden-files: true
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
