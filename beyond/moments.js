@@ -23,6 +23,15 @@
   let switching = false;
   let transitionTimer = 0;
   let muted = false;
+  let resumeAfterApp = false;
+  let pausedBeforeApp = false;
+
+  function notifyMoment(transitioning = false, index = current) {
+    window.dispatchEvent(new CustomEvent('pmsg:moment', { detail: {
+      index, time: transitioning ? 0 : videos[current].currentTime,
+      playing: !transitioning && !videos[current].paused, visible, transitioning
+    } }));
+  }
 
   function updateControls() {
     const playing = !videos[current].paused && !videos[current].ended;
@@ -35,6 +44,7 @@
       else dot.removeAttribute('aria-current');
     });
     originals.forEach((slide, index) => slide.setAttribute('aria-hidden', String(index !== current)));
+    notifyMoment();
   }
 
   function playCurrent() {
@@ -59,6 +69,7 @@
     const next = wrapForward ? 0 : target;
     if (next < 0 || next >= videos.length) return;
     switching = true;
+    notifyMoment(true, next);
     videos[current].pause();
     track.style.transition = '';
     track.style.transform = `translate3d(-${target * 100}%, 0, 0)`;
@@ -99,6 +110,23 @@
     video.addEventListener('playing', () => { startButton.hidden = true; updateControls(); });
     video.addEventListener('play', updateControls);
     video.addEventListener('pause', updateControls);
+    ['timeupdate', 'seeked'].forEach(type => video.addEventListener(type, () => { if (index === current && !switching) notifyMoment(); }));
+  });
+  window.addEventListener('pmsg:moment-control', event => {
+    if (event.detail?.action === 'pause-for-app') {
+      pausedBeforeApp = userPaused;
+      resumeAfterApp = !videos[current].paused;
+      videos[current].pause();
+      userPaused = true;
+      updateControls();
+    }
+    if (event.detail?.action === 'resume-after-app') {
+      userPaused = pausedBeforeApp;
+      const shouldResume = resumeAfterApp || !userPaused;
+      resumeAfterApp = false;
+      if (shouldResume) playCurrent();
+      updateControls();
+    }
   });
   dots.forEach((dot, index) => dot.addEventListener('click', () => goTo(index)));
   startButton.addEventListener('click', () => {
@@ -134,6 +162,7 @@
       visible = entries[0].isIntersecting;
       if (visible) playCurrent();
       else videos[current].pause();
+      notifyMoment();
     }, { threshold: 0.3 });
     observer.observe(carousel.querySelector('.moments-window'));
   } else {

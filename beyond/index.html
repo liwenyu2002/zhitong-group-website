@@ -10,7 +10,9 @@
   <link rel="preload" href="assets/fonts/teaser-kai-light.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css?v=20261103-moments2">
   <script src="app.js?v=20261027-depth1" defer></script>
-  <script src="moments.js?v=20261103-moments2" defer></script>
+  <script src="moments.js?v=20261103-app1" defer></script>
+  <link rel="stylesheet" href="scroll-story.css?v=20261103-app1">
+  <script src="scroll-story.js?v=20261103-app1" defer></script>
 </head>
 <body>
   <a class="skip" href="#story">进入序章</a>
@@ -33,23 +35,30 @@
     </section>
 
     <div id="story" class="anchor"></div>
-    <section class="scene scene-focus" aria-labelledby="thread-title">
+<div class="feature-story"><div class="feature-scenes">
+<section class="scene scene-focus feature-beat" data-app-beat="focus" data-app-tab="status" data-app-signal="eeg" aria-labelledby="thread-title">
       <div class="section-copy reveal"><h2 id="thread-title">一念澄明。</h2></div>
       <div class="scene-art reveal"><img src="assets/02-thread.png" width="1792" height="1024" alt="暗色人像两侧的细光，缓缓收束成一线" loading="lazy"></div>
     </section>
-
-    <section class="paired" aria-label="一念与片刻">
-      <article class="paired-scene reveal">
+<article class="paired-scene feature-beat reveal" data-app-beat="whisper" data-app-tab="status" data-app-signal="eog">
         <div class="paired-art whisper-depth"><img class="whisper-original" src="assets/03-whisper-v2.png" width="1792" height="1024" alt="圆润人像的眼际，一圈极淡的纹路向远处散开" loading="lazy"><img class="whisper-layer whisper-head" src="assets/03-whisper-v2.png" alt="" aria-hidden="true" loading="lazy"><img class="whisper-layer whisper-frame" src="assets/03-whisper-v2.png" alt="" aria-hidden="true" loading="lazy"></div>
         <div class="paired-copy"><h2>一瞬之间。</h2></div>
       </article>
-      <article class="paired-scene reveal">
-        <div class="paired-art rest-depth"><img src="assets/04-rest-cradle.png" width="1792" height="1024" alt="一枚圆润暗石，安稳落在柔和的弧面中" loading="lazy"><img class="rest-stone" src="assets/04-rest.png" width="1792" height="1024" alt="" aria-hidden="true" loading="lazy"></div>
-        <div class="paired-copy"><h2>片刻，有所安放。</h2></div>
-      </article>
+<section class="scene scene-echo feature-beat" data-app-beat="echo" data-app-tab="status" data-app-signal="eeg" aria-labelledby="echo-title">
+      <div class="scene-art reveal"><img src="assets/06-echo.png" width="1792" height="1024" alt="微光穿过高低不同的暗色圆润体块" loading="lazy"></div>
+      <div class="section-copy reveal"><h2 id="echo-title">起伏，都有回声。</h2></div>
     </section>
-
-    <section class="scene scene-moments" aria-labelledby="moments-title">
+<article class="paired-scene scene-rest feature-beat reveal" data-app-beat="rest" data-app-tab="home">
+        <div class="paired-art rest-depth rest-symbol"><img src="assets/04-rest-cradle.png" width="1792" height="1024" alt="一枚圆润暗石，安稳落在柔和的弧面中" loading="lazy"><img class="rest-stone" src="assets/04-rest.png" width="1792" height="1024" alt="" aria-hidden="true" loading="lazy"></div>
+        <div class="paired-copy"><h2>片刻，有所安放。</h2></div>
+      <figure class="home-demo" data-phase="arrival">
+  <div class="home-video-shell">
+    <video id="home-sofa-video" src="assets/home/sofa.mp4" poster="assets/home/sofa-poster.jpg" playsinline preload="metadata" controls aria-label="第一视角回家后躺下，灯光逐渐变暗的场景演示"></video>
+    <button class="home-start" type="button" aria-label="有声播放回家场景" hidden><span aria-hidden="true">▷</span></button>
+  </div>
+  <figcaption class="home-caption"><span id="home-demo-caption" aria-live="polite">回家</span><button id="home-replay" type="button">重新播放</button></figcaption>
+</figure></article>
+<section class="scene scene-moments feature-beat" data-app-beat="moments" data-app-tab="memory" data-memory-view="people" aria-labelledby="moments-title">
       <div class="section-copy reveal"><h2 id="moments-title">一瞬触动，<br>悄然留存。</h2></div>
       <div class="scene-art reveal"><img src="assets/05-moments.png" width="1792" height="1024" alt="比心、远望、冲线与挥别的抽象片段，向右侧的黑暗延伸" loading="lazy"></div>
       <div class="moments-carousel" aria-label="值得留存的三个瞬间" role="region">
@@ -68,22 +77,21 @@
         </div>
       </div>
     </section>
-
-    <section class="scene scene-echo" aria-labelledby="echo-title">
-      <div class="scene-art reveal"><img src="assets/06-echo.png" width="1792" height="1024" alt="微光穿过高低不同的暗色圆润体块" loading="lazy"></div>
-      <div class="section-copy reveal"><h2 id="echo-title">起伏，都有回声。</h2></div>
-    </section>
-
-    <section class="scene scene-traces" aria-labelledby="traces-title">
+<section class="scene scene-traces feature-beat" data-app-beat="traces" data-app-tab="memory" data-memory-view="people" aria-labelledby="traces-title">
       <div class="section-copy reveal"><h2 id="traces-title">那些小事，<br>还在原处。</h2></div>
       <div class="scene-art reveal memory-depth"><img class="memory-original" src="assets/07-traces.png" width="1792" height="1024" alt="几幅日常暗色片段，杯子后的一串钥匙被轻轻照亮" loading="lazy"><img class="memory-layer memory-one" src="assets/07-traces.png" alt="" aria-hidden="true" loading="lazy"><img class="memory-layer memory-two" src="assets/07-traces.png" alt="" aria-hidden="true" loading="lazy"><img class="memory-layer memory-three" src="assets/07-traces.png" alt="" aria-hidden="true" loading="lazy"></div>
     </section>
-
-    <section class="scene scene-path" aria-labelledby="path-title">
+<section class="scene scene-path feature-beat" data-app-beat="path" data-app-tab="agent" aria-labelledby="path-title">
       <div class="scene-art reveal"><img src="assets/08-path.png" width="1792" height="1024" alt="一个抽象人影沿着柔和光路向前，转角隐入黑暗" loading="lazy"></div>
       <div class="section-copy reveal"><h2 id="path-title">路，自会展开。</h2></div>
     </section>
-
+</div>
+<aside class="feature-rail" aria-label="随滚动切换的 App 演示">
+  <div class="phone-sticky"><div class="phone-holder" inert aria-hidden="true">
+    <div class="phone-device"><div class="phone-screen"><iframe id="story-app" src="phone/app.html?v=20261103-app1" title="眼镜 App：今日、家居、记忆与 Agent" loading="eager" allow="autoplay"></iframe></div><div class="phone-island" aria-hidden="true"></div></div>
+  </div></div>
+</aside>
+</div>
     <section class="details" id="details" aria-label="细节">
       <div class="details-grid">
         <figure class="detail detail-touch reveal"><div class="detail-art"><img src="assets/09-touch.png" alt="黑灰色曲面上，一小片细腻织物触面" width="1024" height="1536" loading="lazy"></div><figcaption><h3>柔软，随形。</h3></figcaption></figure>
