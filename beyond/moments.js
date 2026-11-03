@@ -6,6 +6,7 @@
   const videos = originals.map(slide => slide.querySelector('video'));
   const controls = carousel.querySelector('.moments-controls');
   const playButton = carousel.querySelector('.moments-play');
+  const startButton = carousel.querySelector('.moments-start');
   const soundButton = carousel.querySelector('.moments-sound');
   const dots = [...carousel.querySelectorAll('.moments-dots button')];
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -21,7 +22,7 @@
   let userPaused = false;
   let switching = false;
   let transitionTimer = 0;
-  let muted = true;
+  let muted = false;
 
   function updateControls() {
     const playing = !videos[current].paused && !videos[current].ended;
@@ -42,7 +43,13 @@
     video.muted = muted;
     const playResult = video.play();
     if (playResult && typeof playResult.catch === 'function') {
-      playResult.catch(() => updateControls());
+      playResult.catch(error => {
+        // Browsers can require a click before permitting audible playback.
+        if (error.name !== 'AbortError' && video === videos[current] && visible && !document.hidden && !userPaused && video.paused) {
+          startButton.hidden = false;
+        }
+        updateControls();
+      });
     }
   }
 
@@ -89,10 +96,15 @@
       if (index === current && visible && !userPaused) goTo(current + 1);
       else updateControls();
     });
+    video.addEventListener('playing', () => { startButton.hidden = true; updateControls(); });
     video.addEventListener('play', updateControls);
     video.addEventListener('pause', updateControls);
   });
   dots.forEach((dot, index) => dot.addEventListener('click', () => goTo(index)));
+  startButton.addEventListener('click', () => {
+    userPaused = false;
+    playCurrent();
+  });
   playButton.addEventListener('click', () => {
     if (!videos[current].paused && !videos[current].ended) {
       userPaused = true;

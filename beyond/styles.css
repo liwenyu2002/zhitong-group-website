@@ -95,8 +95,8 @@ figcaption h3{font-weight:400}
 @media(max-width:900px){.afterglow-art{left:0}}
 
 /* A quiet window for the moments: the footage keeps its original color and sound. */
-.moments-carousel{width:min(100%,1020px);margin:clamp(28px,4vw,64px) auto 0;position:relative}
-.moments-window{overflow:hidden;aspect-ratio:16/9;background:#000}
+.moments-carousel{width:min(100%,1020px);margin:clamp(-110px,-6vw,-55px) auto 0;position:relative}
+.moments-window{position:relative;overflow:hidden;aspect-ratio:16/9;background:#000}
 .moments-track{display:flex;width:100%;height:100%;transform:translate3d(0,0,0);transition:transform .8s cubic-bezier(.22,.6,.22,1)}
 .moments-slide{flex:0 0 100%;min-width:0;height:100%;background:#000}
 .moments-slide video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
@@ -113,5 +113,10 @@ figcaption h3{font-weight:400}
 .moments-dots button{width:24px;height:32px;display:grid;place-items:center}
 .moments-dots button::after{content:"";display:block;width:4px;height:4px;border-radius:50%;background:#555;transition:background .3s,transform .3s}
 .moments-dots button[aria-current="true"]::after{background:#ddd;transform:scale(1.3)}
-@media(max-width:600px){.moments-carousel{width:100%;margin-top:32px}.moments-controls{padding:0 var(--side)}}
+@media(max-width:600px){.moments-carousel{width:100%;margin-top:-42px}.moments-controls{padding:0 var(--side)}}
 @media(prefers-reduced-motion:reduce){.moments-track{transition:none}}
+
+.moments-start[hidden]{display:none}
+.moments-start{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);width:56px;height:56px;border:1px solid #ffffff80;border-radius:50%;background:#0009;color:#fff;display:grid;place-items:center;cursor:pointer}
+.moments-start:focus-visible{outline:1px solid #fff;outline-offset:5px}
+.moments-start svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.25;stroke-linejoin:round}
