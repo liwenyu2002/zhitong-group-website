@@ -2,3 +2,4 @@
 deployment/gate/private/
 deployment/gate/.env
 __pycache__/
+deployment/site-worker/dist/

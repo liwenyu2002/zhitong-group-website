@@ -1,0 +1,17 @@
+import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const names = ['entry.html','entry.css','entry.js','eye-cloud.js','eye-sculpture-v2.png'];
+const assets = {};
+for (const name of names) assets[name] = (await readFile(resolve(root,'../gate/public',name))).toString('base64');
+const source = await readFile(resolve(root,'worker/index.js'),'utf8');
+if (!source.includes('/* ENTRY_ASSETS */ null')) throw new Error('Missing entry asset insertion point');
+const bundled = source.replace('/* ENTRY_ASSETS */ null', JSON.stringify(assets));
+const out = resolve(root,'dist');
+await rm(out,{recursive:true,force:true});
+await mkdir(resolve(out,'server'),{recursive:true});
+await mkdir(resolve(out,'.openai'),{recursive:true});
+await writeFile(resolve(out,'server/index.js'),bundled);
+await writeFile(resolve(out,'.openai/hosting.json'),await readFile(resolve(root,'.openai/hosting.json')));
+console.log('Built the site worker and bundled the lightweight entry assets.');

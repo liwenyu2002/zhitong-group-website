@@ -22,8 +22,8 @@
 
 `/beyond/` 在同一域名下由服务器验证密令，网页和视频请求经过会话校验。入口使用点阵眼睛和粒子输入流；验证成功后，粒子立即散开，页面在后台加载。密令验证器保存在服务器的私有文件中，不进入 Git、前端资源或公开发布产物。
 
-`beyond/` 保留预热内容的源码；网关从此仓库读取主站与预热素材。GitHub Pages 作为旧 DNS 缓存的过渡页，`deployment/build-pages.py` 排除预热资源和服务端代码。网关源在对应的 Sites 源仓库中；更改入口或验证逻辑需要同步部署该网关和验证服务。
+`beyond/` 保留预热内容的源码；网站服务从此仓库读取主站与预热素材。GitHub Pages 作为旧 DNS 缓存的过渡页，`deployment/build-pages.py` 排除预热资源和服务端代码。此仓库是公开仓库，仓库中的预热素材及历史版本仍可直接访问。
 
-验证服务与粒子资源位于 `deployment/gate/`，仅使用 Node 内置模块。运行所需变量见 `.env.example`；验证服务仅接受站点网关携带私有凭据的请求。会话采用 Secure、HttpOnly、SameSite cookie，重启服务后需重新输入密令。
+服务端网关的源码镜像位于 `deployment/site-worker/`，粒子入口资源位于 `deployment/gate/public/`。密令和会话签名密钥通过网站托管的秘密变量 `PMSG_PASSWORD`、`PMSG_SESSION_SECRET` 配置，不写入仓库或前端。验证和会话签名均在网站服务端完成，会话采用 Secure、HttpOnly、SameSite cookie。
 
 预热字体按当前页面字符做了子集处理，字形轮廓保持不变。修改主页面文案后，可在安装 `fonttools[woff]` 的 Python 环境运行 `deployment/subset-teaser-fonts.py` 重新生成；完整字体源保留在该脚本指定的历史提交中。
