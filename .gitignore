@@ -1,1 +1,4 @@
 .DS_Store
+deployment/gate/private/
+deployment/gate/.env
+__pycache__/
