@@ -69,7 +69,16 @@
           // continue loading. Never wait for the entire nested page's load.
           const firstScene = Promise.allSettled([
             page.fonts.ready,
-            ...Array.from(page.querySelectorAll('#opening img'), image => image.decode())
+            ...Array.from(page.querySelectorAll('#opening img'), image => {
+              const pending = !image.complete;
+              if (pending) image.style.visibility = 'hidden';
+              return image.decode().then(() => {
+                image.style.removeProperty('visibility');
+                if (pending) image.animate([{ opacity:0 }, { opacity:1 }], {
+                  duration:reduced.matches ? 0 : 650, easing:'cubic-bezier(.2,.7,.2,1)'
+                });
+              });
+            })
           ]);
           await Promise.race([firstScene, new Promise(done => { firstFrameTimer = setTimeout(done, 2500); })]);
           if (settled) return;
