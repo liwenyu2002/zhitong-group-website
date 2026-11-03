@@ -14,6 +14,11 @@ for name in ('index.html', 'CNAME', 'favicon.png', 'favicon-32.png', 'favicon.ic
     shutil.copy2(root / name, destination / name)
 for name in ('css', 'js', 'img'):
     shutil.copytree(root / name, destination / name)
+certificate_challenge = root / 'deployment/cert-validation/fileauth.txt'
+if certificate_challenge.is_file():
+    challenge_directory = destination / '.well-known/pki-validation'
+    challenge_directory.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(certificate_challenge, challenge_directory / 'fileauth.txt')
 (destination / 'beyond').mkdir()
 shutil.copy2(root / 'deployment/beyond-redirect.html', destination / 'beyond/index.html')
 (destination / '.nojekyll').touch()
