@@ -54,16 +54,31 @@
     frame.title = '看见之外';
     frame.allow = 'autoplay; fullscreen';
     const loaded = new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => reject(new Error('load_timeout')), 18000);
-      frame.addEventListener('load', async () => {
+      let preparing = false, settled = false, firstFrameTimer;
+      const stop = () => { clearTimeout(timeout); clearInterval(poll); clearTimeout(firstFrameTimer); };
+      const timeout = setTimeout(() => { settled = true; stop(); reject(new Error('load_timeout')); }, 18000);
+      const poll = setInterval(async () => {
+        if (preparing || settled) return;
         try {
-          if (!frame.contentDocument.querySelector('#opening')) throw new Error('not_authorized');
-          await frame.contentDocument.fonts.ready;
-          clearTimeout(timeout);
+          const page = frame.contentDocument;
+          if (!page || page.readyState === 'loading' || !page.querySelector('#opening')) return;
+          const navigation = frame.contentWindow.performance.getEntriesByType('navigation')[0];
+          if (page.readyState !== 'complete' && !navigation?.domContentLoadedEventEnd) return;
+          preparing = true;
+          // The first scene can enter while offscreen videos and the phone
+          // continue loading. Never wait for the entire nested page's load.
+          const firstScene = Promise.allSettled([
+            page.fonts.ready,
+            ...Array.from(page.querySelectorAll('#opening img'), image => image.decode())
+          ]);
+          await Promise.race([firstScene, new Promise(done => { firstFrameTimer = setTimeout(done, 2500); })]);
+          if (settled) return;
+          settled = true;
+          stop();
           frame.classList.add('is-ready');
           resolve();
-        } catch (error) { clearTimeout(timeout); reject(error); }
-      }, { once: true });
+        } catch (error) { settled = true; stop(); reject(error); }
+      }, 50);
     });
     frame.src = '/beyond/';
     document.body.append(frame);

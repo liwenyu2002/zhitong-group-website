@@ -25,3 +25,5 @@
 主站通过 `.github/workflows/pages.yml` 发布，`deployment/build-pages.py` 仅复制主站所需文件及预热入口跳转，排除受保护的预热资源和服务端代码。`beyond/` 仍保留预热内容的源码。修改预热内容后，还需将其同步至独立服务；仅推送 GitHub Pages 不会更新该服务。
 
 服务端入口与粒子资源位于 `deployment/gate/`，仅使用 Node 内置模块。运行所需变量见 `.env.example`；生产服务监听本机回环地址，通过独立 Cloudflare Tunnel 提供 HTTPS。会话采用 Secure、HttpOnly、SameSite cookie，重启服务后需重新输入密令。
+
+预热字体按当前页面字符做了子集处理，字形轮廓保持不变。修改主页面文案后，可在安装 `fonttools[woff]` 的 Python 环境运行 `deployment/subset-teaser-fonts.py` 重新生成；完整字体源保留在该脚本指定的历史提交中。入口只等待首屏就绪，下方视频和手机界面继续加载。
