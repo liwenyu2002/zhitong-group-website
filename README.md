@@ -26,4 +26,6 @@
 
 服务端网关的源码镜像位于 `deployment/site-worker/`，粒子入口资源位于 `deployment/gate/public/`。密令和会话签名密钥通过网站托管的秘密变量 `PMSG_PASSWORD`、`PMSG_SESSION_SECRET` 配置，不写入仓库或前端。验证和会话签名均在网站服务端完成，会话采用 Secure、HttpOnly、SameSite cookie。
 
+腾讯云 EdgeOne Makers 的构建脚本为 `deployment/edgeone/build.py`。执行 `python3 deployment/edgeone/build.py /tmp/zhitong-edgeone /tmp/zhitong-edgeone.zip` 可生成直接上传包；密令和签名密钥仍需在托管服务端配置。
+
 预热字体按当前页面字符做了子集处理，字形轮廓保持不变。修改主页面文案后，可在安装 `fonttools[woff]` 的 Python 环境运行 `deployment/subset-teaser-fonts.py` 重新生成；完整字体源保留在该脚本指定的历史提交中。
