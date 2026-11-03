@@ -54,8 +54,8 @@
     frame.title = '看见之外';
     frame.allow = 'autoplay; fullscreen';
     const loaded = new Promise((resolve, reject) => {
-      let preparing = false, settled = false, firstFrameTimer;
-      const stop = () => { clearTimeout(timeout); clearInterval(poll); clearTimeout(firstFrameTimer); };
+      let preparing = false, settled = false;
+      const stop = () => { clearTimeout(timeout); clearInterval(poll); };
       const timeout = setTimeout(() => { settled = true; stop(); reject(new Error('load_timeout')); }, 18000);
       const poll = setInterval(async () => {
         if (preparing || settled) return;
@@ -67,20 +67,16 @@
           preparing = true;
           // The first scene can enter while offscreen videos and the phone
           // continue loading. Never wait for the entire nested page's load.
-          const firstScene = Promise.allSettled([
-            page.fonts.ready,
-            ...Array.from(page.querySelectorAll('#opening img'), image => {
+          Array.from(page.querySelectorAll('#opening img'), image => {
               const pending = !image.complete;
               if (pending) image.style.visibility = 'hidden';
-              return image.decode().then(() => {
+              image.decode().then(() => {
                 image.style.removeProperty('visibility');
                 if (pending) image.animate([{ opacity:0 }, { opacity:1 }], {
                   duration:reduced.matches ? 0 : 650, easing:'cubic-bezier(.2,.7,.2,1)'
                 });
-              });
-            })
-          ]);
-          await Promise.race([firstScene, new Promise(done => { firstFrameTimer = setTimeout(done, 2500); })]);
+              }).catch(() => {});
+            });
           if (settled) return;
           settled = true;
           stop();
@@ -92,15 +88,13 @@
     frame.src = '/beyond/';
     document.body.append(frame);
     try {
-      // Prepare the destination under the eye before releasing the particles.
-      // Its first frame then emerges through the gaps in the scattering cloud.
-      await loaded;
+      // Release immediately; the first scene becomes visible when it is ready.
       entry.classList.add('is-dispersing');
       entry.dispatchEvent(new Event('entry:scatter'));
       const motion = window.entryEye?.ready ? window.entryEye.unlock(1650) : reduced.matches ? Promise.resolve() : eye.animate([
         { opacity: 1 }, { opacity: 0 }
       ], { duration: 700, easing: 'ease-out', fill: 'forwards' }).finished;
-      await motion;
+      await Promise.all([loaded, motion]);
       entry.classList.add('is-revealing');
       entry.inert = true;
       frame.focus();

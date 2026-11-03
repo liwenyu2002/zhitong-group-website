@@ -14,16 +14,16 @@
 - **成果** — 代表性成果列表
 - **加入我们** — 招生与联系
 
-课题组主站为静态站点（HTML / CSS / Canvas，无第三方依赖），支持中英双语，经 GitHub Pages 部署，自定义域名见 `CNAME`。
+课题组主站为静态站点（HTML / CSS / Canvas，无第三方依赖），支持中英双语。站点网关使用 `www.zhitong-group.com`，主站内容来自此仓库。
 
 ## 看见之外 · 序章
 
 预热页面位于 [`/beyond/`](https://www.zhitong-group.com/beyond/)，静态文件独立放在 `beyond/`，首页导航提供入口。页面沿用黑白抽象海报、隐喻短句和滚动显现，以一台持续显示的手机串联「今日、家居、记忆、Agent」四个可交互页面。手机随滚动切页，记忆图谱淡入；家居和高光视频与顶部通知同步，高光视频可在记忆页回看。App 内的人物、指标和设备联动均为演示数据，不连接实际设备。
 
-`/beyond/` 原入口转向 `https://beyond.wenyuli.site/beyond/`。预热页面由独立 Node 服务验证密令后提供，页面、App、图片和视频均经过服务端会话校验。入口使用点阵眼睛和粒子输入流；验证成功后，粒子沿不同轨迹散开并显露页面。密令验证器保存在服务器的私有文件中，不进入 Git、前端资源或公开发布产物。
+`/beyond/` 在同一域名下由服务器验证密令，网页和视频请求经过会话校验。入口使用点阵眼睛和粒子输入流；验证成功后，粒子立即散开，页面在后台加载。密令验证器保存在服务器的私有文件中，不进入 Git、前端资源或公开发布产物。
 
-主站通过 `.github/workflows/pages.yml` 发布，`deployment/build-pages.py` 仅复制主站所需文件及预热入口跳转，排除受保护的预热资源和服务端代码。`beyond/` 仍保留预热内容的源码。修改预热内容后，还需将其同步至独立服务；仅推送 GitHub Pages 不会更新该服务。
+`beyond/` 保留预热内容的源码；网关从此仓库读取主站与预热素材。GitHub Pages 作为旧 DNS 缓存的过渡页，`deployment/build-pages.py` 排除预热资源和服务端代码。网关源在对应的 Sites 源仓库中；更改入口或验证逻辑需要同步部署该网关和验证服务。
 
-服务端入口与粒子资源位于 `deployment/gate/`，仅使用 Node 内置模块。运行所需变量见 `.env.example`；生产服务监听本机回环地址，通过独立 Cloudflare Tunnel 提供 HTTPS。会话采用 Secure、HttpOnly、SameSite cookie，重启服务后需重新输入密令。
+验证服务与粒子资源位于 `deployment/gate/`，仅使用 Node 内置模块。运行所需变量见 `.env.example`；验证服务仅接受站点网关携带私有凭据的请求。会话采用 Secure、HttpOnly、SameSite cookie，重启服务后需重新输入密令。
 
-预热字体按当前页面字符做了子集处理，字形轮廓保持不变。修改主页面文案后，可在安装 `fonttools[woff]` 的 Python 环境运行 `deployment/subset-teaser-fonts.py` 重新生成；完整字体源保留在该脚本指定的历史提交中。入口只等待首屏就绪，下方视频和手机界面继续加载。
+预热字体按当前页面字符做了子集处理，字形轮廓保持不变。修改主页面文案后，可在安装 `fonttools[woff]` 的 Python 环境运行 `deployment/subset-teaser-fonts.py` 重新生成；完整字体源保留在该脚本指定的历史提交中。

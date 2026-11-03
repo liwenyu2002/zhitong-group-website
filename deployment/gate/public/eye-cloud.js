@@ -146,7 +146,7 @@
     if (!fullScreen) { imageWidth = width; imageHeight = height; }
     // Fixed-size dots overlap more as the same cloud becomes smaller.
     // Compensate their energy to retain the reference lighting on phones.
-    baseGain = 2.95 * Math.pow(imageWidth / 840, 2) * Math.min(1, Math.pow(.94 * dpr, 2));
+    baseGain = 2.95 * (190000 / count) * Math.pow(imageWidth / 840, 2) * Math.min(1, Math.pow(.94 * dpr, 2));
   }
   function onPointer(event) {
     if (unlockState || !bounds || reduced.matches) return;
@@ -230,10 +230,11 @@
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
     gl.uniform1i(uniforms.uReference,0);
-    const values = [];
+    const particleCount = matchMedia('(max-width:600px)').matches ? 85000 : 120000;
+    const values = new Float32Array(particleCount * 4);
     let seed = 104729;
     const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) | 0; return (seed >>> 0) / 4294967296; };
-    for (let i = 0; i < 190000; i++) {
+    for (let i = 0; i < particleCount; i++) {
       const radius = Math.sqrt(.068*.068 + random() * (.43*.43 - .068*.068));
       const theta = random() * Math.PI * 2;
       const band = Math.min(1,Math.max(0,(radius-.18)/.25));
@@ -246,10 +247,11 @@
       }
       const lane = Math.min(7,Math.floor((radius-.068)/(.43-.068)*8));
       const sector = Math.floor(theta/(Math.PI*2)*20);
-      values.push(radius,theta,lane*20+sector,random());
+      values[i*4] = radius; values[i*4+1] = theta;
+      values[i*4+2] = lane*20+sector; values[i*4+3] = random();
     }
-    count = values.length / 4;
-    buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(values), gl.STATIC_DRAW);
+    count = particleCount;
+    buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer); gl.bufferData(gl.ARRAY_BUFFER, values, gl.STATIC_DRAW);
     const location = gl.getAttribLocation(program,'aOrbit');
     gl.enableVertexAttribArray(location); gl.vertexAttribPointer(location,4,gl.FLOAT,false,16,0);
     gl.enable(gl.BLEND); gl.blendFuncSeparate(gl.ONE,gl.ONE,gl.ONE,gl.ONE_MINUS_SRC_ALPHA);

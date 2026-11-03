@@ -11,13 +11,16 @@ const root = import.meta.dirname;
 const port = Number(process.env.PMSG_PORT || 18770);
 const origin = process.env.PMSG_ORIGIN;
 if (!origin || new URL(origin).origin !== origin) throw new Error('PMSG_ORIGIN must be an origin.');
-const publicHost = new URL(origin).host;
+const publicHost = process.env.PMSG_UPSTREAM_HOST || new URL(origin).host;
 const secure = new URL(origin).protocol === 'https:';
 if (!secure && !['127.0.0.1','localhost'].includes(new URL(origin).hostname)) throw new Error('HTTPS required.');
 const siteRoot = await realpath(process.env.PMSG_SITE_ROOT || path.join(root, 'site'));
 const secretFile = process.env.PMSG_SECRET_FILE;
 if (!secretFile) throw new Error('PMSG_SECRET_FILE is required.');
 const config = JSON.parse(await readFile(secretFile, 'utf8'));
+const proxyKey = process.env.PMSG_PROXY_SECRET_FILE
+  ? Buffer.from((await readFile(process.env.PMSG_PROXY_SECRET_FILE, 'utf8')).trim())
+  : null;
 const expected = Buffer.from(config.hash, 'hex');
 const salt = Buffer.from(config.salt, 'hex');
 if (expected.length !== 32 || salt.length < 16) throw new Error('Invalid server authentication configuration.');
@@ -77,7 +80,7 @@ async function bodyFor(req) {
 }
 async function unlock(req, res) {
   if (req.headers.origin !== origin || req.headers['content-type']?.split(';')[0] !== 'application/json') return json(res, 403, { ok:false });
-  const forwarded = req.headers['cf-connecting-ip'];
+  const forwarded = proxyKey ? req.headers['x-pmsg-client-ip'] : req.headers['cf-connecting-ip'];
   const ip = typeof forwarded === 'string' && isIP(forwarded) ? forwarded : req.socket.remoteAddress;
   const now = Date.now();
   if (attempts.size > 10000) {
@@ -116,8 +119,13 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   try {
     if (req.headers.host !== publicHost) return json(res, 403, { ok:false });
+    if (proxyKey) {
+      const received = Buffer.from(String(req.headers['x-pmsg-origin-token'] || ''));
+      if (received.length !== proxyKey.length || !timingSafeEqual(received, proxyKey)) return json(res, 403, { ok:false });
+    }
     const url = new URL(req.url, origin);
     if (url.pathname === '/_entry/unlock' && req.method === 'POST') return await unlock(req, res);
+    if (url.pathname === '/_entry/session-check' && req.method === 'GET') return json(res, sessionFor(req) ? 200 : 401, { ok:Boolean(sessionFor(req)) });
     if (!['GET', 'HEAD'].includes(req.method)) return json(res, 405, { ok:false }, { Allow:'GET, HEAD' });
     if (url.pathname === '/favicon.ico') { res.writeHead(204).end(); return; }
     if (publicFiles.has(url.pathname)) return await serve(req, res, publicFiles.get(url.pathname));
