@@ -4322,10 +4322,10 @@ document.addEventListener('click',event=>{
   else if(b.hasAttribute('data-memory-view')){nxMemory.query='';nxEl('nx-memory-search').value='';nxSetMemoryView(b.dataset.memoryView)}
   else if(b.hasAttribute('data-memory-all')){nxMemory.query='';nxEl('nx-memory-search').value='';nxSetMemoryView('records');selectAppTab('memory');nxScroll.scrollTop=0}
   else if(b.hasAttribute('data-task')){const id=b.dataset.task;nxMemory.taskDone.has(id)?nxMemory.taskDone.delete(id):nxMemory.taskDone.add(id);nxRenderDaily();document.querySelector('[data-task="'+CSS.escape(id)+'"]')?.focus({preventScroll:true})}
-  else if(b.hasAttribute('data-ask-record')){const e=nxEvent(b.dataset.askRecord);if(e)nxAsk('关于「'+e.title+'」，有哪些值得记住的事？',[e.id])}
-  else if(b.hasAttribute('data-ask-person')){const p=nxPerson(b.dataset.askPerson);if(p)nxAsk('帮我回顾一下和'+p.name+'有关的事',nxPersonEvents(p.id).map(e=>e.id))}
-  else if(b.hasAttribute('data-ask'))nxAsk(b.dataset.ask);
-  else if(b.hasAttribute('data-chat-prompt'))nxSubmitChat(b.dataset.chatPrompt);
+  else if(b.hasAttribute('data-ask-record')){const e=nxEvent(b.dataset.askRecord);if(e){const en=window.PmsgLanguage?.language==='en',title=window.PmsgLanguage?.translate(e.title)||e.title;nxAsk(en?'What should I remember about '+title+'?':'关于「'+e.title+'」，有哪些值得记住的事？',[e.id])}}
+  else if(b.hasAttribute('data-ask-person')){const p=nxPerson(b.dataset.askPerson);if(p){const en=window.PmsgLanguage?.language==='en',name=window.PmsgLanguage?.translate(p.name)||p.name;nxAsk(en?'Help me recall what I know about '+name+'.':'帮我回顾一下和'+p.name+'有关的事',nxPersonEvents(p.id).map(e=>e.id))}}
+  else if(b.hasAttribute('data-ask'))nxAsk(window.PmsgLanguage?.translate(b.dataset.ask)||b.dataset.ask);
+  else if(b.hasAttribute('data-chat-prompt'))nxSubmitChat(window.PmsgLanguage?.translate(b.dataset.chatPrompt)||b.dataset.chatPrompt);
 });
 nxEl('nx-summary-open').addEventListener('click',nxOpenSummary);
 nxEl('nx-related-note').addEventListener('click',()=>{const related=nxMemory.related;if(related)nxOpenDetail('关联记录','由相关记忆整理',`<p class="nx-detail-copy">${nxEscape(related.text)}</p><div class="nx-record-list">${(related.sourceIds||[]).map(nxEvent).filter(Boolean).map(nxEventRow).join('')}</div>`)});
@@ -4653,5 +4653,5 @@ addEventListener('load',()=>setTimeout(()=>{
   if(new URLSearchParams(location.search).get('section')==='signals')requestAnimationFrame(()=>{const card=nxEl('nx-signal-panel').closest('.nx-signals');nxScroll.scrollTop+=card.getBoundingClientRect().top-nxScroll.getBoundingClientRect().top-10});
   window.__memorySampleReady=true;
 },150));
-</script><script src="story-embed.js?v=20261103-app1"></script><script src="../language.js?v=20261104-1"></script></body>
+</script><script src="story-embed.js?v=20261103-app1"></script><script src="../language.js?v=20261104-2"></script></body>
 </html>

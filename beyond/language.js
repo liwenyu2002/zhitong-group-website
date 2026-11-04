@@ -189,6 +189,101 @@
     '· 晚上给妈妈打电话。': '· Call Mom in the evening.'
   };
 
+  // Settings, detail dialogs and demo replies are created after the app opens.
+  Object.assign(english, {
+    '设备与采集': 'Devices & signals', '信号来源、通道与设备连接': 'Sources, channels and connections',
+    '设备与信号': 'Devices & signals', '设备尚未连接': 'No device connected',
+    '麦克风': 'Microphone', '眼镜麦克风': 'Glasses mic', '本机麦克风': 'Device mic',
+    '声音参数': 'Audio details', '响度 -- · 峰值 -- · 过零率 --': 'Level -- · Peak -- · Zero-crossing rate --',
+    '头部动作': 'Head movement', '等待 IMU': 'Waiting for IMU', '实时采样': 'Live sampling',
+    '稳定': 'Stable', '相对姿态': 'Relative orientation', '自动归位': 'Returning to center',
+    '上': 'Up', '右': 'Right', '下': 'Down', '左': 'Left',
+    '向上': 'Up', '向右': 'Right', '向下': 'Down', '向左': 'Left',
+    '查看原始参数 · X / Y / Z': 'Raw data · X / Y / Z', '原始参数': 'Raw data',
+    '陀螺仪': 'Gyroscope', '加速度': 'Acceleration', '重力': 'Gravity',
+    '脑电与眼动': 'EEG & eye movement', '左眼': 'Left eye', '右眼': 'Right eye',
+    '左眼通道': 'Left-eye channel', '右眼通道': 'Right-eye channel',
+    '波形': 'Waveform', '电极接触': 'Electrode contact', '连接设备': 'Connect device', '已连接': 'Connected',
+    '测试眼动操作': 'Test eye gestures', '闭左眼': 'Close left eye', '闭右眼': 'Close right eye',
+    '咬紧牙': 'Clench jaw', '眨两次': 'Blink twice', '眨三次': 'Blink three times',
+    '手动测试：按住左眼 2 秒唤醒，咬肌 3 秒关闭': 'Manual test: hold left eye for 2 seconds to wake; clench jaw for 3 seconds to close.',
+    '等待本机 EEG 设备服务': 'Waiting for the local EEG service', '点击扫描发现附近发射器': 'Scan for nearby transmitters',
+    '扫描': 'Scan', '解除': 'Unbind', '绑定': 'Bind', '状态指数': 'State scores',
+    '焦虑、专注、放松与疲劳指数范围为 0–100，用于观察状态变化。': 'Anxiety, focus, calm and fatigue scores range from 0 to 100 and show changes over time.',
+    '尚未收到评估数据时显示「—」。': 'A dash appears until data is available.',
+    '你的眼镜助手': 'Your glasses assistant', '实时模式': 'Live mode', '首页': 'Home', '眼镜': 'Glasses',
+    '姿态': 'Orientation', '眼镜画面': 'Glasses view', '画面来源': 'Video source', '数据集视频': 'Dataset video',
+    '实时眼镜': 'Live glasses', '米家摄像头': 'Mi Home camera', '暂无画面': 'No video yet',
+    '连接眼镜后显示实时画面与字幕。': 'Live video and captions appear when glasses are connected.',
+    '画面识别': 'Video recognition', '等待画面': 'Waiting for video', '标签识别待命': 'Label recognition ready',
+    '米家辅视图': 'Mi Home camera view', '智能家居': 'Smart home',
+    '将想控制的设备移到画面中间': 'Move the device you want to control to the center of the view',
+    '历史记忆 · 标签证据': 'Past memory · label', '黑色导电 3D 打印材料': 'Black conductive 3D-printing material',
+    '历史记忆：视频中的白色标签可见 Conductive 字样': 'Past memory: the white label in the video says Conductive',
+    '连接后，这里会显示你说的话。': 'Your words will appear here when connected.',
+    '语音助手': 'Voice assistant', '长闭左眼 2 秒，唤醒语音对话': 'Close your left eye for 2 seconds to start a conversation',
+    '视频示例': 'Video examples', '离线 · 运动相机': 'Offline · Action camera',
+    '离线 · 咖啡与冰箱': 'Offline · Coffee and fridge', '离线 · 冰箱与烤箱': 'Offline · Fridge and oven',
+    '离线 · 咖啡豆与研磨': 'Offline · Coffee beans and grinding', '离线 · 打蛋与接水': 'Offline · Eggs and water',
+    '离线 · P01 全片': 'Offline · P01 full video', '离线 · GoPro 全片': 'Offline · GoPro full video',
+    '最近回复': 'Latest reply', '暂无回复': 'No replies yet',
+    '连接眼镜后，长闭左眼 2 秒开始对话。': 'Once connected, close your left eye for 2 seconds to start a conversation.',
+    '眼动操作': 'Eye gestures', '闭左眼 2 秒': 'Close left eye for 2 seconds',
+    '听到提示音后开始说话。': 'Speak after the tone.', '咬紧牙 3 秒': 'Clench jaw for 3 seconds',
+    '结束当前对话。': 'End the current conversation.', '声音与眼动设置': 'Audio & eye-gesture settings',
+    '麦克风、信号通道与动作测试': 'Microphone, channels and gesture tests', '行为记录': 'Activity log',
+    '等待事件': 'Waiting for activity', '当前行为': 'Current activity', '等待视觉事件': 'Waiting for visual activity',
+    '连续帧确认动作后，会在这里显示物体与场景细节。': 'Object and scene details appear here after an action is confirmed across frames.',
+    '时序证据 --': 'Sequence evidence --', 'Qwen 27B · 4 帧时序': 'Qwen 27B · 4-frame sequence',
+    '等待中': 'Waiting', '清空记录': 'Clear history', '暂无记录，连接眼镜后开始记录。': 'No activity yet. Connect glasses to start recording.',
+    '自动化记录': 'Automation log', '▶ 开始场景演示': '▶ Start demo', '■ 中断演示': '■ Stop demo',
+    '任务进度': 'Task progress', '等待实时信号': 'Waiting for live signals', '等待佩戴者进入场景': 'Waiting for the wearer to enter the scene',
+    '画面、眼动和设备反馈会按顺序记录在这里。': 'Video, eye movement and device responses are recorded here in sequence.',
+    '多级行为时间线': 'Activity timeline', '选择数据集视频': 'Choose a dataset video',
+    'HoloAssist · GoPro 60 秒': 'HoloAssist · GoPro 60 seconds', 'HD-EPIC · 咖啡与冰箱': 'HD-EPIC · Coffee and fridge',
+    'EPIC-KITCHENS · 冰箱与烤箱': 'EPIC-KITCHENS · Fridge and oven', 'EPIC-KITCHENS · 咖啡豆与研磨': 'EPIC-KITCHENS · Coffee beans and grinding',
+    'HD-EPIC · 打蛋、放锅与接水': 'HD-EPIC · Eggs, pan and water', 'HD-EPIC · P01 全片': 'HD-EPIC · P01 full video',
+    'HoloAssist · GoPro 全片': 'HoloAssist · GoPro full video', '回到当前进度': 'Return to current position',
+    '一级元事件会自动合并为二级事件与三级活动': 'Individual events are grouped into actions and activities.',
+    '设备': 'Devices', '客厅设备': 'Living room devices', '米家遥控器': 'Mi Home remote',
+    '开启': 'Turn on', '关闭': 'Turn off', '选择设备操作': 'Choose a device action', '房间示意': 'Room overview',
+    '以设备状态为准': 'Actual device status may vary', '关闭设置': 'Close settings', '麦克风来源': 'Microphone source',
+    '使用眼镜麦克风进行语音识别': 'Use the glasses microphone for speech recognition',
+    '使用当前设备麦克风进行语音识别': 'Use this device’s microphone for speech recognition',
+    '麦克风波形': 'Microphone waveform', '固定参考球上的眼镜相对转动反馈': 'Glasses orientation relative to a fixed reference sphere',
+    '眼镜原始 IMU 参数': 'Raw glasses IMU data', '选择左右眼 EEG 通道': 'Choose left- and right-eye EEG channels',
+    'EEG 模式与设备': 'EEG mode and device', '测量电极接触阻抗（kΩ）': 'Measure electrode contact impedance (kΩ)',
+    '左右眼双通道 EEG 实时波形': 'Live EEG waveforms for both eyes', '五类眼电动作': 'Five eye gestures',
+    '按住满 2 秒唤醒语音；家居控制时调暗，松开停止': 'Hold for 2 seconds to wake voice; hold to dim lights, release to stop',
+    '按住约 2 秒，松开结束': 'Hold for about 2 seconds, then release',
+    '按住满 3 秒关闭语音，松开结束': 'Hold for 3 seconds to close voice, then release', '点击模拟一次动作': 'Click to simulate a gesture',
+    'EEG 设备发现与绑定': 'Find and bind an EEG device', '关闭说明': 'Close explanation', '关闭详情': 'Close details',
+    '连接状态': 'Connection status', '后端连接中断': 'Backend disconnected', '选择视频来源': 'Choose video source',
+    '公开数据集示例视频': 'Public dataset example video', '眼镜实时视频': 'Live glasses video', '视频语义标注': 'Video annotations',
+    'YOLO 视觉识别': 'YOLO visual recognition', '米家摄像头辅视图': 'Mi Home camera view',
+    '收起米家辅视图': 'Collapse Mi Home camera view', '可选设备': 'Available devices', '稳定注视进度': 'Gaze progress',
+    '关闭历史记忆': 'Close past memory', '导电耗材历史记忆视频': 'Past memory video of conductive material',
+    '画面旋转控制': 'Video rotation controls', '向左旋转': 'Rotate left', '向右旋转': 'Rotate right',
+    '视频来源': 'Video source', 'Agent 状态': 'Agent status', '眼动使用说明': 'Eye-gesture instructions',
+    '清空当前来源的行为记录': 'Clear activity for this source', '实时行为时间线': 'Live activity timeline',
+    '开始场景演示': 'Start demo', '中断当前演示': 'Stop demo', '演示背景音乐': 'Demo background music',
+    '收起米家遥控器': 'Collapse Mi Home remote', '室内智能家居三维效果示意图': '3D smart-home illustration',
+    '客厅智能家居三维效果示意图': '3D living-room illustration', '和 Agent 聊聊今天': 'Talk to Agent about today',
+    '帮我回顾一下今天': 'Help me review today', '日常减压建议': 'Everyday stress tips',
+    '仅凭这些状态指数无法判断是否患有疾病，也不能据此决定用药。如果不适持续或影响日常生活，建议咨询医生。': 'These scores alone cannot determine whether you have a condition or whether you need medication. If symptoms persist or affect daily life, consult a doctor.',
+    '如果你愿意，可以先说说最近具体有哪些感受、持续了多久。': 'If you like, tell me what you have been feeling and for how long.',
+    '可以先留意休息后有没有缓解，以及是否影响睡眠和日常活动。持续不适时，和医生聊聊会更合适。': 'Notice whether rest helps and whether it affects your sleep or daily activities. If discomfort persists, consider talking to a doctor.',
+    '我可以帮你回看已有记录，但目前没有足够的健康记录来解释原因。': 'I can review your records, but there is not enough health information to explain the cause.',
+    '目前只有这个人物的信息，还没有相关记录。': 'There is information about this person, but no related records yet.',
+    '你和阿远约了周六短线徒步，计划晚饭前回城。路线和天气留到周五确认。': 'You and A Yuan planned a short hike on Saturday and expect to return before dinner. Check the route and weather on Friday.',
+    '咖啡店新认识的人推荐过山脚下的一条步道，具体路线还没有记录。': 'Someone you met at the coffee shop recommended a trail at the foot of the mountain; the exact route was not recorded.',
+    '明天 12:00 前，要把两版首页草图发给林可。周老师也建议先用两版草图把思路讲清楚。': 'Send two homepage sketches to Lin Ke by noon tomorrow. Teacher Zhou also suggested using sketches to clarify the idea.',
+    '我和小满周五有什么安排？': 'What are Xiaoman and I doing on Friday?',
+    '她周五汇报结束后，你们约好一起吃晚饭。她想吃热乎的暖锅，餐厅还没定。': 'You planned dinner after her presentation on Friday. She would like hot pot; the restaurant is undecided.',
+    '先把手上的事放一放，给自己留一小段休息时间。觉得紧绷时，可以慢慢呼吸，或轻轻活动一下。': 'Pause what you are doing and take a short break. If you feel tense, breathe slowly or move gently.',
+    '你是今天比较累，还是最近一直这样？': 'Are you tired today, or has it been ongoing?'
+  });
+
   const textOriginals = new WeakMap();
   const attributeOriginals = new WeakMap();
   const translatedAttributes = ['aria-label', 'placeholder', 'alt', 'title'];
@@ -202,7 +297,20 @@
     if (!trimmed) return value;
     let result = english[trimmed];
     if (result === undefined) {
+      const quoted = trimmed.match(/^“([\s\S]+)”$/);
+      const suffix = trimmed.match(/^([\s\S]*?)(\s*[↗→])$/);
+      if (quoted) {
+        const inner = englishText(quoted[1]);
+        if (inner !== quoted[1]) result = `“${inner}”`;
+      } else if (suffix) {
+        const inner = englishText(suffix[1]);
+        if (inner !== suffix[1]) result = inner + suffix[2];
+      }
+    }
+    if (result === undefined) {
       const rules = [
+        [/^(-?\d+(?:\.\d+)?)° 相对$/, (_, value) => `${value}° relative`],
+        [/^响度 (.+?) · 峰值 (.+?) · 过零率 (.+)$/, (_, level, peak, rate) => `Level ${level} · Peak ${peak} · Zero-crossing rate ${rate}`],
         [/^(\d+) 位人物 · (\d+) 条记录$/, (_, a, b) => `${a} people · ${b} records`],
         [/^(\d+) 位人物的姓名或关系待确认$/, (_, n) => `${n} person’s details unconfirmed`],
         [/^(\d+) 台开启 · (\d+) 台设备$/, (_, a, b) => `${a} on · ${b} devices`],
@@ -286,8 +394,8 @@
     document.title = language === 'en' ? englishText(originalTitle) : originalTitle;
     if (persist) { try { localStorage.setItem(storageKey, language); } catch {} }
     document.querySelectorAll('[data-language-switch]').forEach(button => {
-      button.setAttribute('aria-label', language === 'en' ? '切换为中文' : 'Switch to English');
-      button.setAttribute('title', language === 'en' ? '切换为中文' : 'Switch to English');
+      button.setAttribute('aria-label', language === 'en' ? 'Switch to Chinese' : 'Switch to English');
+      button.setAttribute('title', language === 'en' ? 'Switch to Chinese' : 'Switch to English');
     });
     if (document.body) translateTree(document.body);
     window.dispatchEvent(new CustomEvent('pmsg:languagechange', { detail: { language } }));
