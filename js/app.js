@@ -466,18 +466,26 @@
     window.__brainDebug = () => ({ ...bgDbg });
     let brainFrame;
     window.labBrainSnapshot = () => {
-      if (!brainFrame) return [];
+      if (!brainFrame) return null;
       const { cx, cy, rot, w, h, reveal } = brainFrame;
       const cos = Math.cos(rot), sin = Math.sin(rot);
-      const snapshot = [];
-      for (const dot of dots) {
+      const points = [], links = [];
+      const visible = new Int16Array(dots.length).fill(-1);
+      for (const [index, dot] of dots.entries()) {
         if (dot.rank > reveal) continue;
         const x = (cx + dot.sx * cos - dot.sy * sin) / w;
         const y = (cy + dot.sx * sin + dot.sy * cos) / h;
         if (x < 0 || x > 1 || y < 0 || y > 1) continue;
-        snapshot.push({ x, y, size: dot.paintSize, alpha: dot.paintAlpha, light: dot.lit });
+        visible[index] = points.length;
+        points.push({ x, y, size: dot.paintSize, alpha: dot.paintAlpha, light: dot.lit, radial: dot.radial });
       }
-      return snapshot;
+      for (let i = 0; i < dots.length; i++) {
+        if (visible[i] < 0) continue;
+        for (const j of adj[i]) {
+          if (j > i && visible[j] >= 0) links.push([visible[i], visible[j]]);
+        }
+      }
+      return { canvas, points, links, x: cx / w, y: cy / h };
     };
     // ── 神经粒子流：大脑上对应位置的点阵被四台设备吸引流走 ──
     const flowDevs = ['.desktop', '.phone', '.watch', '.laptop'].map(s => document.querySelector(s));

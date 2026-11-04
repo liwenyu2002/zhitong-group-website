@@ -1,11 +1,15 @@
 /* The lab page briefly breaks apart before the dark teaser entrance. */
-html.beyond-is-leaving { background: #000; }
-html.beyond-is-leaving :is(#deck, .topnav, #bgBrain, #grain) {
-  animation: beyond-fracture 1.12s steps(1, end) both;
+html.beyond-is-leaving { --beyond-exit-time: 1.27s; background: #000; }
+html.beyond-is-leaving :is(#deck, .topnav, #grain) {
+  animation:
+    beyond-fracture var(--beyond-exit-time) steps(1, end) both,
+    beyond-content-fade var(--beyond-exit-time) ease both;
 }
-html.beyond-is-leaving .topnav { animation-delay: -24ms; }
-html.beyond-is-leaving #bgBrain { animation-delay: -12ms; }
-html.beyond-has-brain #bgBrain { visibility: hidden; animation: none; }
+html.beyond-is-leaving .topnav { animation-delay: -24ms, 0ms; }
+html.beyond-is-leaving #grain { --beyond-start-opacity: .3; }
+html.beyond-is-leaving:not(.beyond-has-brain) #bgBrain {
+  animation: beyond-content-fade var(--beyond-exit-time) ease both;
+}
 
 .beyond-handoff {
   position: fixed;
@@ -16,12 +20,11 @@ html.beyond-has-brain #bgBrain { visibility: hidden; animation: none; }
   isolation: isolate;
 }
 .beyond-handoff > i { position: absolute; display: block; }
-.beyond-handoff > .portal-particles { position: absolute; inset: 0; width: 100%; height: 100%; }
 .beyond-handoff__scan {
   inset: 0;
   background: repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0, 0, 0, .22) 4px 5px);
   opacity: 0;
-  animation: beyond-scan 1.12s linear both;
+  animation: beyond-scan var(--beyond-exit-time) linear both;
 }
 .beyond-handoff__tear {
   inset: -2% -3%;
@@ -29,7 +32,7 @@ html.beyond-has-brain #bgBrain { visibility: hidden; animation: none; }
     repeating-linear-gradient(transparent 0 5px, rgba(177, 206, 199, .22) 5px 6px),
     linear-gradient(90deg, rgba(7, 12, 13, .88), rgba(0, 0, 0, .38) 50%, rgba(4, 9, 10, .72));
   opacity: 0;
-  animation: beyond-tear 1.12s steps(1, end) both;
+  animation: beyond-tear var(--beyond-exit-time) steps(1, end) both;
 }
 .beyond-handoff__line {
   inset: 50% 0 auto;
@@ -38,15 +41,23 @@ html.beyond-has-brain #bgBrain { visibility: hidden; animation: none; }
   box-shadow: 0 0 15px rgba(202, 226, 221, .2);
   opacity: 0;
   transform: scaleX(.4);
-  animation: beyond-line 1.12s ease-out both;
+  animation: beyond-line var(--beyond-exit-time) ease-out both;
 }
 .beyond-handoff__black {
+  position: fixed;
+  z-index: 0;
   inset: 0;
   background: #000;
   opacity: 0;
-  animation: beyond-black 1.12s linear both;
+  pointer-events: none;
+  animation: beyond-black var(--beyond-exit-time) linear both;
 }
 
+@keyframes beyond-content-fade {
+  0%, 10% { opacity: var(--beyond-start-opacity, 1); }
+  26% { opacity: calc(var(--beyond-start-opacity, 1) * .62); }
+  56%, 100% { opacity: 0; }
+}
 @keyframes beyond-fracture {
   0%, 16%, 22%, 38%, 43%, 56%, 62%, 100% { translate: 0 0; }
   17% { translate: -8px 0; }
@@ -78,13 +89,13 @@ html.beyond-has-brain #bgBrain { visibility: hidden; animation: none; }
   78%, 100% { opacity: 0; transform: scaleX(1); }
 }
 @keyframes beyond-black {
-  0%, 39% { opacity: 0; }
-  53% { opacity: .13; }
+  0%, 43% { opacity: 0; }
+  52% { opacity: .13; }
   68% { opacity: .72; }
   79%, 100% { opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html.beyond-is-leaving :is(#deck, .topnav, #bgBrain, #grain),
-  .beyond-handoff > i { animation: none; }
+  .beyond-handoff > i, .beyond-handoff__black { animation: none; }
 }

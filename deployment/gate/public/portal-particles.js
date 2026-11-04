@@ -1,11 +1,12 @@
 (() => {
   'use strict';
 
-  const handoff = 1120;
-  const arrivalEnd = 1780;
-  const scatterEnd = 590;
+  const handoff = 1270;
+  const arrivalEnd = 1940;
+  const scatterEnd = 820;
   const clamp = value => Math.max(0, Math.min(1, value));
   const ease = value => value * value * (3 - 2 * value);
+  const mix = (from, to, amount) => from + (to - from) * amount;
 
   function seededRandom(seed) {
     return () => {
@@ -14,72 +15,49 @@
     };
   }
 
-  function eyeTarget(random, index) {
-    const along = random() * 2 - 1;
-    const iris = random() < .31;
-    const angle = random() * Math.PI * 2;
-    const radius = .078 + .082 * random();
-    const lid = index % 2 ? .135 : -.158;
-    return {
-      targetX: iris ? Math.cos(angle) * radius : along * .37,
-      targetY: .021 + (iris ? Math.sin(angle) * radius : lid * (1 - along * along) + (random() - .5) * .038)
-    };
-  }
-
-  // Both documents draw the same flight, so the last frame on the lab
-  // page and the first frame at the gate use the same particle positions.
-  function makeParticles() {
-    const random = seededRandom(48271);
-    return Array.from({ length: 320 }, (_, index) => {
-      const side = index % 4;
-      const lane = .08 + .84 * random();
-      const edge = .015 + .065 * random();
-      const x = side === 0 ? -edge : side === 1 ? 1 + edge : lane;
-      const y = side === 2 ? -edge : side === 3 ? 1 + edge : lane;
-      return {
-        x, y,
-        ...eyeTarget(random, index),
-        bend: (random() - .5) * .42,
-        start: 20 + Math.pow(random(), 1.55) * 440,
-        duration: 710 + random() * 610,
-        light: .32 + random() * .62,
-        size: .64 + random() * 1.12,
-        trail: .012 + random() * .027
-      };
-    });
-  }
-
-  function makeBrainParticles(origins, count) {
+  function makeParticles(origins, count) {
     const random = seededRandom(16481);
     return Array.from({ length: count }, (_, index) => {
       const angle = random() * Math.PI * 2;
-      const radius = .08 + .47 * Math.sqrt(random());
+      const radius = .13 + .28 * Math.sqrt(random());
+      const along = random() * 2 - 1;
+      const iris = random() < .31;
+      const irisAngle = random() * Math.PI * 2;
+      const irisRadius = .078 + .082 * random();
+      const lid = index % 2 ? .135 : -.158;
+      const origin = origins[index];
       return {
-        origin: origins[index],
-        ...eyeTarget(random, index),
-        scatterX: .5 + Math.cos(angle) * radius,
-        scatterY: .43 + Math.sin(angle) * radius * .96,
+        origin,
+        targetX: iris ? Math.cos(irisAngle) * irisRadius : along * .37,
+        targetY: .021 + (iris ? Math.sin(irisAngle) * irisRadius : lid * (1 - along * along) + (random() - .5) * .038),
+        spreadX: Math.cos(angle) * radius,
+        spreadY: Math.sin(angle) * radius * .83,
         phase: angle,
-        launch: 285 + random() * 120,
-        delay: random() * 120,
-        duration: 435 + random() * 360,
-        curl: (random() - .5) * .20,
-        size: .68 + random() * 1.18,
-        light: .33 + random() * .52
+        launch: 348 + (1 - clamp(origin?.radial ?? 0)) * 172 + random() * 78,
+        delay: random() * 102,
+        duration: 378 + random() * 310,
+        curl: (random() - .5) * .23,
+        size: .86 + random() * 1.13,
+        light: .38 + random() * .53
       };
     });
   }
 
-  function fly(container, { arriving = false, brain = [], brainCount = brain.length } = {}) {
-    const canvas = document.createElement('canvas');
+  function fly(field, arriving = false) {
+    const count = Math.min(1500, Math.max(0, Math.trunc(field?.count ?? field?.points?.length) || 0));
+    if (!count) return null;
+
+    const canvas = field.canvas ?? document.createElement('canvas');
     const context = canvas.getContext('2d');
     if (!context) return null;
-    canvas.className = 'portal-particles';
-    canvas.setAttribute('aria-hidden', 'true');
-    container.append(canvas);
+    if (arriving) {
+      canvas.className = 'portal-particles';
+      canvas.setAttribute('aria-hidden', 'true');
+      document.body.append(canvas);
+    }
 
-    const particles = makeParticles();
-    const brainParticles = makeBrainParticles(brain, Math.min(1500, Math.max(0, Math.trunc(brainCount) || 0)));
+    const particles = makeParticles(field.points ?? [], count);
+    const links = field.links ?? [];
     const from = arriving ? handoff : 0;
     const until = arriving ? arrivalEnd : handoff;
     const started = performance.now();
@@ -90,74 +68,49 @@
       if (width !== innerWidth || height !== innerHeight) {
         width = innerWidth;
         height = innerHeight;
-        canvas.width = Math.round(width * scale);
-        canvas.height = Math.round(height * scale);
-        context.setTransform(scale, 0, 0, scale, 0, 0);
-        context.lineCap = 'round';
+        const pixelWidth = Math.round(width * scale), pixelHeight = Math.round(height * scale);
+        if (canvas.width !== pixelWidth) canvas.width = pixelWidth;
+        if (canvas.height !== pixelHeight) canvas.height = pixelHeight;
       }
+      context.save();
+      context.setTransform(scale, 0, 0, scale, 0, 0);
       context.clearRect(0, 0, width, height);
-      const compact = width <= 600;
-      const eyeWidth = compact ? width * 1.16 : Math.min(840, width * .86);
-      const convergence = Math.min(width, height);
-      const light = clamp((time - 520) / 420);
-      const tone = Math.round(62 + light * 151);
-      const silver = 'rgb(' + tone + ' ' + (tone + 5) + ' ' + (tone + 4) + ')';
-      context.strokeStyle = context.fillStyle = silver;
 
-      for (let index = 0; index < (compact ? 208 : particles.length); index++) {
-        const particle = particles[index];
-        const progress = (time - particle.start) / particle.duration;
-        if (progress <= 0 || progress >= 1) continue;
+      const eyeWidth = width <= 600 ? width * 1.16 : Math.min(840, width * .86);
+      const span = Math.min(width, height);
+      const cx = mix(field.x, .5, .36), cy = mix(field.y, .44, .36);
+      const light = ease(clamp((time - 605) / 410));
+      const tone = Math.round(50 + light * 174);
+      const silver = 'rgb(' + tone + ' ' + (tone + 4) + ' ' + (tone + 3) + ')';
+      const warm = 1 - ease(clamp((time - 462) / 383));
+      const wake = ease(clamp((time - 30) / 300));
+      const fade = 1 - ease(clamp((time - 1490) / 432));
 
-        const sx = particle.x * width;
-        const sy = particle.y * height;
-        const dx = width / 2 + particle.targetX * eyeWidth - sx;
-        const dy = height * .42 + particle.targetY * eyeWidth - sy;
-        const length = Math.hypot(dx, dy) || 1;
-        const bend = particle.bend * convergence / length;
-        const ahead = Math.pow(progress, 1.17);
-        const behind = Math.pow(Math.max(0, progress - particle.trail), 1.17);
-        const arc = Math.sin(Math.PI * ahead) * bend;
-        const tailArc = Math.sin(Math.PI * behind) * bend;
-        const x = sx + dx * ahead - dy * arc;
-        const y = sy + dy * ahead + dx * arc;
-        const alpha = particle.light * clamp(progress * 8) * clamp((1 - progress) * 5);
-
-        context.globalAlpha = alpha * .56;
-        context.lineWidth = particle.size * .64;
-        context.beginPath();
-        context.moveTo(sx + dx * behind - dy * tailArc, sy + dy * behind + dx * tailArc);
-        context.lineTo(x, y);
-        context.stroke();
-        context.globalAlpha = alpha;
-        context.fillRect(x, y, particle.size, particle.size);
-      }
-
-      // Each real brain dot trembles, breaks from its original position and
-      // reaches a seeded scatter point. From there the two pages agree
-      // on its position without storing or copying the original snapshot.
-      const warm = 1 - ease(clamp((time - 305) / 420));
-      const reveal = ease(clamp(time / 360));
-      const dissolve = 1 - ease(clamp((time - 1270) / 480));
-      for (const particle of brainParticles) {
-        let x = particle.scatterX * width;
-        let y = particle.scatterY * height;
+      for (const particle of particles) {
+        let x = Math.max(.13 * width, Math.min(.87 * width, cx * width + particle.spreadX * span));
+        let y = Math.max(.14 * height, Math.min(.85 * height, cy * height + particle.spreadY * span));
         let size = particle.size;
-        let alpha = particle.light * dissolve;
+        let alpha = particle.light * fade;
+        let roundness = 1;
+        let color = silver;
+        particle.attached = false;
 
         if (time < scatterEnd && particle.origin) {
           const origin = particle.origin;
-          const launch = clamp((time - particle.launch) / (scatterEnd - particle.launch));
-          const spread = 1 - Math.pow(1 - launch, 2.4);
-          const tremor = reveal * (1 - launch) * (4 + 9 * reveal);
-          x = origin.x * width * (1 - spread) + x * spread + Math.sin(time * .066 + particle.phase) * tremor;
-          y = origin.y * height * (1 - spread) + y * spread + Math.cos(time * .082 + particle.phase * 2) * tremor * .66;
-          size += (origin.size - size) * (1 - spread);
-          alpha += (origin.alpha - alpha) * (1 - reveal);
-          const red = Math.round(tone + (31 + 175 * origin.light - tone) * warm);
-          const green = Math.round(tone + 5 + (30 + 92 * origin.light - tone - 5) * warm);
-          const blue = Math.round(tone + 4 + (27 + 45 * origin.light - tone - 4) * warm);
-          context.fillStyle = 'rgb(' + red + ' ' + green + ' ' + blue + ')';
+          const release = clamp((time - particle.launch) / (scatterEnd - particle.launch));
+          const spread = 1 - Math.pow(1 - release, 1.9);
+          const tremor = wake * (1 - release) * (2.5 + 5 * wake);
+          const drift = Math.sin(Math.PI * spread) * span * .037;
+          x = mix(origin.x * width, x, spread) + Math.sin(time * .068 + particle.phase) * tremor - Math.sin(particle.phase) * drift;
+          y = mix(origin.y * height, y, spread) + Math.cos(time * .077 + particle.phase * 2) * tremor * .68 + Math.cos(particle.phase) * drift;
+          size = mix(origin.size * (1 + .12 * wake), size, ease(release));
+          alpha = mix(origin.alpha, alpha, wake);
+          roundness = ease(clamp((release - .06) / .67));
+          particle.attached = release < .035;
+          const red = Math.round(mix(tone, 31 + 175 * origin.light, warm));
+          const green = Math.round(mix(tone + 4, 30 + 92 * origin.light, warm));
+          const blue = Math.round(mix(tone + 3, 27 + 45 * origin.light, warm));
+          color = 'rgb(' + red + ' ' + green + ' ' + blue + ')';
         } else {
           const gather = ease(clamp((time - scatterEnd - particle.delay) / particle.duration));
           const dx = width / 2 + particle.targetX * eyeWidth - x;
@@ -165,20 +118,56 @@
           const turn = Math.sin(Math.PI * gather) * particle.curl;
           x += dx * gather - dy * turn;
           y += dy * gather + dx * turn;
-          context.fillStyle = silver;
         }
-        context.globalAlpha = alpha;
-        context.fillRect(x - size / 2, y - size / 2, size, size);
+        particle.x = x;
+        particle.y = y;
+        particle.sizeNow = size;
+        particle.alpha = alpha;
+        particle.roundness = roundness;
+        particle.color = color;
       }
+
+      // Keep the original connections visible until their endpoints lift off.
+      if (time < scatterEnd && links.length) {
+        context.globalAlpha = .06 + wake * .12;
+        context.strokeStyle = '#1f1e1b';
+        context.lineWidth = 1;
+        context.beginPath();
+        for (const [i, j] of links) {
+          const a = particles[i], b = particles[j];
+          if (!a?.attached || !b?.attached) continue;
+          context.moveTo(a.x, a.y);
+          context.lineTo(b.x, b.y);
+        }
+        context.stroke();
+      }
+
+      for (const { x, y, sizeNow, alpha, roundness, color } of particles) {
+        const half = sizeNow / 2;
+        context.globalAlpha = alpha;
+        context.fillStyle = color;
+        if (roundness <= 0) {
+          context.fillRect(x - half, y - half, sizeNow, sizeNow);
+        } else {
+          context.beginPath();
+          if (roundness < .995 && typeof context.roundRect === 'function') {
+            context.roundRect(x - half, y - half, sizeNow, sizeNow, half * roundness);
+          } else {
+            context.arc(x, y, half, 0, Math.PI * 2);
+          }
+          context.fill();
+        }
+      }
+      context.restore();
     }
 
     function stop() {
       cancelAnimationFrame(frame);
-      canvas.remove();
+      if (arriving) canvas.remove();
     }
 
     function tick(now) {
-      const time = Math.min(until, from + now - started);
+      const time = Math.min(until, from + Math.max(0, now - started));
       draw(time);
       if (time < until) frame = requestAnimationFrame(tick);
       else if (arriving) stop();
@@ -193,12 +182,13 @@
   if (document.currentScript.hasAttribute('data-portal-arrival')) {
     let arrival;
     try {
-      arrival = JSON.parse(sessionStorage.getItem('zhitong-beyond-arrival'));
+      const saved = sessionStorage.getItem('zhitong-beyond-arrival');
       sessionStorage.removeItem('zhitong-beyond-arrival');
+      arrival = JSON.parse(saved);
     } catch {}
     if (arrival?.at && Date.now() - arrival.at < 15000 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       document.documentElement.classList.add('from-group-portal');
-      fly(document.body, { arriving: true, brainCount: arrival.brainCount });
+      fly(arrival.field, true);
     }
   }
 })();
