@@ -1,22 +1,32 @@
 (() => {
   'use strict';
   const entry = document.querySelector('#entry');
+  const bridge = window.beyondEyeBridge;
   const host = document.querySelector('.eye');
   const source = document.querySelector('.eye-main');
+  const reference = bridge ? new Image() : source;
+  if (source.dataset.src) reference.src = source.dataset.src;
+  if (!bridge) {
+    const errorImage = document.querySelector('.eye-red');
+    if (errorImage.dataset.src) errorImage.src = errorImage.dataset.src;
+  }
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const canvas = document.createElement('canvas');
   canvas.id = 'eye-cloud';
   canvas.setAttribute('aria-hidden', 'true');
-  host.append(canvas);
+  if (!bridge) host.append(canvas);
 
   const vertexSource = `
     precision highp float;
     attribute vec4 aOrbit;
+    attribute vec4 aFlight;
+    attribute vec2 aFamily;
     uniform sampler2D uReference;
     uniform float uTime;
     uniform float uMotion;
     uniform float uDpr;
     uniform float uBurst;
+    uniform float uArrival;
     uniform float uGain;
     uniform vec2 uSize;
     uniform vec2 uImageSize;
@@ -53,6 +63,9 @@
       vec2 uv = p * .5 + .5;
       float light = dot(texture2D(uReference, uv).rgb, vec3(.2126, .7152, .0722));
       if (light < .003 || any(lessThan(uv,vec2(0.0))) || any(greaterThan(uv,vec2(1.0)))) {
+        light = 0.0;
+      }
+      if (light == 0.0 && uArrival >= 1.0) {
         gl_Position = vec4(2.0, 2.0, 0.0, 1.0);
         gl_PointSize = 1.0;
         vLight = 0.0;
@@ -92,11 +105,25 @@
         pointSize *= (1.0 + released * (.25 + randomB * .85))
                    * (1.0 - .7 * smoothstep(.4, 1.0, flight));
       }
-      gl_Position = vec4(position, 0.0, 1.0);
-      gl_PointSize = max(1.0, pointSize * uDpr);
       // Smooth material lighting changes only with the birds' position.
       // Correct the density of elliptical lanes to keep the reference light.
       vLight = (light + .003 * smoothstep(.003,.025,light)) * uGain * areaWeight * 1.447 * energy;
+      if (uArrival < 1.0) {
+        float travel = smoothstep(0.0, .96, uArrival);
+        if (aFlight.z >= 0.0) {
+          position = mix(aFlight.xy, position, travel);
+          pointSize = mix(aFlight.w, pointSize, travel);
+          vLight = mix(aFlight.z, vLight, travel);
+        } else {
+          float birth = .035 + seed * .62;
+          float open = smoothstep(birth, min(1.0, birth + .36), uArrival);
+          vec2 parent = mix(aFlight.xy, aFamily * uScale + uCenter, travel);
+          position = mix(parent, position, open);
+          vLight *= smoothstep(birth, birth + .22, uArrival) * sqrt(open);
+        }
+      }
+      gl_Position = vec4(position, 0.0, 1.0);
+      gl_PointSize = max(1.0, pointSize * uDpr);
     }
   `;
   const fragmentSource = `
@@ -115,14 +142,15 @@
     }
   `;
 
-  let gl, program, buffer, texture, frameId, observer;
-  let disposed = false, fullScreen = false, errorAt = -10000;
+  let gl, program, buffer, flightBuffer, texture, frameId, observer;
+  let disposed = false, registered = false, fullScreen = false, errorAt = -10000;
   let width = 1, height = 1, dpr = 1, count = 0, imageWidth = 1, imageHeight = 1;
   let burst = 0, baseGain = 2.95, gain = 2.95, red = 0;
   let camera = [0, 0], targetCamera = [0, 0], mouse = [5, 5];
   let scale = [1, 1], center = [0, 0], origin = [0, 0];
   let bounds;
   let unlockState = null;
+  let arrivalStarted = -Infinity;
   let previousFrame = performance.now(), simulationTime = 0, visibleEstimate = 0;
   const abort = new AbortController();
   const uniforms = {};
@@ -143,6 +171,13 @@
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
     gl.viewport(0, 0, canvas.width, canvas.height);
+    if (bridge) {
+      const rect = entry.querySelector('.eye-position').getBoundingClientRect();
+      imageWidth = rect.width;
+      imageHeight = rect.height;
+      scale = [rect.width / width, rect.height / height];
+      center = [(rect.left + rect.width / 2) / width * 2 - 1, 1 - (rect.top + rect.height / 2) / height * 2];
+    }
     if (!fullScreen) { imageWidth = width; imageHeight = height; }
     // Fixed-size dots overlap more as the same cloud becomes smaller.
     // Compensate their energy to retain the reference lighting on phones.
@@ -150,8 +185,9 @@
   }
   function onPointer(event) {
     if (unlockState || !bounds || reduced.matches) return;
-    const x = (event.clientX - bounds.left) / width * 2 - 1;
-    const y = 1 - (event.clientY - bounds.top) / height * 2;
+    const eyeBounds = bridge ? entry.querySelector('.eye-position').getBoundingClientRect() : bounds;
+    const x = (event.clientX - eyeBounds.left) / eyeBounds.width * 2 - 1;
+    const y = 1 - (event.clientY - eyeBounds.top) / eyeBounds.height * 2;
     targetCamera = [Math.max(-1, Math.min(1, x)), Math.max(-1, Math.min(1, y))];
     mouse = [x, y];
   }
@@ -162,9 +198,11 @@
     observer?.disconnect();
     abort.abort();
     if (buffer) gl.deleteBuffer(buffer);
+    if (flightBuffer) gl.deleteBuffer(flightBuffer);
     if (program) gl.deleteProgram(program);
     if (texture) gl.deleteTexture(texture);
-    window.entryEye = null;
+    if (bridge) canvas.remove();
+    if (registered) window.entryEye = null;
   }
   function ease(x) { return x * x * (3 - 2 * x); }
   function draw(now) {
@@ -192,6 +230,7 @@
     gl.uniform1f(uniforms.uMotion, motionAmount);
     gl.uniform1f(uniforms.uDpr, dpr);
     gl.uniform1f(uniforms.uBurst, burst);
+    gl.uniform1f(uniforms.uArrival, Math.min(1, (now - arrivalStarted) / 940));
     gl.uniform1f(uniforms.uGain, gain);
     gl.uniform1f(uniforms.uRed, red);
     gl.uniform2f(uniforms.uSize, width, height);
@@ -205,8 +244,58 @@
     frameId = requestAnimationFrame(draw);
   }
 
+  function groupIncomingDots(points, orbits, projected, samples) {
+    const originals = orbits.slice();
+    const used = new Uint8Array(orbits.length / 4);
+    // Give each existing dot an actual lit orbit near its original destination.
+    const families = points.map(point => {
+      let best = samples[0], distance = Infinity;
+      for (const candidate of samples) {
+        if (used[candidate]) continue;
+        const dx = projected[candidate * 2] - point.targetX;
+        const dy = projected[candidate * 2 + 1] - point.targetY;
+        const score = dx * dx * 2.25 + dy * dy;
+        if (score < distance) { best = candidate; distance = score; }
+      }
+      used[best] = 1;
+      return { point, orbit: best, x: projected[best * 2], y: projected[best * 2 + 1] };
+    });
+    const columns = 32, rows = 24;
+    const lookup = Array.from({ length: columns * rows }, (_, cell) => {
+      const x = (cell % columns + .5) / columns, y = (Math.floor(cell / columns) + .5) / rows;
+      let nearest = 0, distance = Infinity;
+      for (let i = 0; i < families.length; i++) {
+        const dx = families[i].x - x, dy = families[i].y - y;
+        const score = dx * dx * 2.25 + dy * dy;
+        if (score < distance) { nearest = i; distance = score; }
+      }
+      return nearest;
+    });
+    const flight = new Float32Array(orbits.length / 4 * 6);
+    let remaining = 0;
+    for (let index = 0; index < orbits.length / 4; index++) {
+      const original = index < families.length;
+      while (used[remaining]) remaining++;
+      const orbitIndex = original ? families[index].orbit : remaining++;
+      const column = Math.max(0, Math.min(columns - 1, Math.floor(projected[orbitIndex * 2] * columns)));
+      const row = Math.max(0, Math.min(rows - 1, Math.floor(projected[orbitIndex * 2 + 1] * rows)));
+      const family = families[original ? index : lookup[row * columns + column]];
+      const input = orbitIndex * 4, output = index * 4;
+      for (let channel = 0; channel < 4; channel++) orbits[output + channel] = originals[input + channel];
+      const { point, x, y } = family, offset = index * 6;
+      flight[offset] = point.x * 2 - 1;
+      flight[offset + 1] = 1 - point.y * 2;
+      flight[offset + 2] = original ? point.alpha * .92 : -1;
+      flight[offset + 3] = point.size;
+      flight[offset + 4] = x * 2 - 1;
+      flight[offset + 5] = 1 - y * 2;
+    }
+    return flight;
+  }
+
   async function init() {
-    await source.decode();
+    await reference.decode();
+    if (bridge && !bridge.active) return;
     gl = canvas.getContext('webgl', { alpha:true, premultipliedAlpha:true, antialias:false, depth:false, stencil:false, powerPreference:'high-performance' });
     if (!gl) throw new Error('webgl_unavailable');
     if (!gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS)) throw new Error('vertex_texture_unavailable');
@@ -215,12 +304,12 @@
     gl.attachShader(program, vertex); gl.attachShader(program, fragment); gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error('shader_link');
     gl.deleteShader(vertex); gl.deleteShader(fragment); gl.useProgram(program);
-    for (const name of ['uTime','uMotion','uDpr','uBurst','uGain','uRed','uSize','uImageSize','uCamera','uMouse','uScale','uCenter','uOrigin','uReference']) uniforms[name] = gl.getUniformLocation(program, name);
+    for (const name of ['uTime','uMotion','uDpr','uBurst','uArrival','uGain','uRed','uSize','uImageSize','uCamera','uMouse','uScale','uCenter','uOrigin','uReference']) uniforms[name] = gl.getUniformLocation(program, name);
     const sample = document.createElement('canvas');
-    sample.width = source.naturalWidth; sample.height = source.naturalHeight;
+    sample.width = reference.naturalWidth; sample.height = reference.naturalHeight;
     const context = sample.getContext('2d', { willReadFrequently:true });
     context.filter = 'blur(2.5px)';
-    context.drawImage(source, 0, 0);
+    context.drawImage(reference, 0, 0);
     const pixels = context.getImageData(0, 0, sample.width, sample.height).data;
     texture = gl.createTexture(); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,texture);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
@@ -232,6 +321,8 @@
     gl.uniform1i(uniforms.uReference,0);
     const particleCount = matchMedia('(max-width:600px)').matches ? 85000 : 120000;
     const values = new Float32Array(particleCount * 4);
+    const projected = bridge ? new Float32Array(particleCount * 2) : null;
+    const samples = [];
     let seed = 104729;
     const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) | 0; return (seed >>> 0) / 4294967296; };
     for (let i = 0; i < particleCount; i++) {
@@ -241,45 +332,81 @@
       const flatten = 1 - .36 * band * band * (3 - 2*band);
       const px = .5 + Math.cos(theta)*radius;
       const py = .53 - Math.sin(theta)*radius*flatten*(sample.width/sample.height);
+      if (projected) {
+        projected[i * 2] = px;
+        projected[i * 2 + 1] = py;
+      }
       if (px>=0&&px<1&&py>=0&&py<1) {
         const index=(Math.floor(py*sample.height)*sample.width+Math.floor(px*sample.width))*4;
-        if(pixels[index]>.011*255)visibleEstimate++;
+        if (pixels[index] > .011 * 255) {
+          visibleEstimate++;
+          if (projected && i % 6 === 0) samples.push(i);
+        }
       }
       const lane = Math.min(7,Math.floor((radius-.068)/(.43-.068)*8));
       const sector = Math.floor(theta/(Math.PI*2)*20);
       values[i*4] = radius; values[i*4+1] = theta;
       values[i*4+2] = lane*20+sector; values[i*4+3] = random();
     }
+    const incoming = bridge?.capture();
+    if (incoming && samples.length < incoming.length) throw new Error('eye_reference_too_sparse');
+    const flight = incoming ? groupIncomingDots(incoming, values, projected, samples) : null;
     count = particleCount;
     buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer); gl.bufferData(gl.ARRAY_BUFFER, values, gl.STATIC_DRAW);
     const location = gl.getAttribLocation(program,'aOrbit');
     gl.enableVertexAttribArray(location); gl.vertexAttribPointer(location,4,gl.FLOAT,false,16,0);
+    if (flight) {
+      flightBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, flightBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, flight, gl.STATIC_DRAW);
+      const from = gl.getAttribLocation(program, 'aFlight'), family = gl.getAttribLocation(program, 'aFamily');
+      gl.enableVertexAttribArray(from); gl.vertexAttribPointer(from, 4, gl.FLOAT, false, 24, 0);
+      gl.enableVertexAttribArray(family); gl.vertexAttribPointer(family, 2, gl.FLOAT, false, 24, 16);
+      fullScreen = true;
+      canvas.classList.add('portal-eye-cloud');
+      document.body.append(canvas);
+    }
     gl.enable(gl.BLEND); gl.blendFuncSeparate(gl.ONE,gl.ONE,gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
     observer = new ResizeObserver(resize); observer.observe(canvas); resize();
     window.addEventListener('pointermove', onPointer, { passive:true, signal:abort.signal });
     document.addEventListener('pointerleave', () => { targetCamera=[0,0];mouse=[5,5]; }, { signal:abort.signal });
-    entry.addEventListener('entry:deny', () => { errorAt=performance.now(); }, { signal:abort.signal });
+    entry.addEventListener('entry:deny', () => {
+      errorAt = performance.now();
+      if (bridge && !reduced.matches) canvas.animate(
+        [0, -14, 12, -9, 7, -4, 2, 0].map(x => ({ transform: 'translateX(' + x + 'px)' })),
+        { duration: 640, easing: 'ease-out' }
+      );
+    }, { signal:abort.signal });
     entry.dataset.renderer = 'point-cloud';
     entry.dataset.points = String(count);
+    const firstFrame = performance.now();
+    if (bridge) {
+      entry.dataset.seedPoints = String(incoming.length);
+      arrivalStarted = firstFrame;
+      bridge.finish();
+    }
+    registered = true;
     window.entryEye = {
       ready:true,
       getState:() => ({ count, visibleEstimate, red, zoom:1, burst, width, height, simulationTime, renderer:'point-cloud', motion:unlockState?'particle-burst':'flocking-orbits' }),
       unlock(duration = 1650) {
         errorAt = -10000;
-        const rect = canvas.getBoundingClientRect();
-        const pupilX = .5, pupilY = .53;
-        imageWidth = rect.width; imageHeight = rect.height;
-        fullScreen = true;
-        origin = [pupilX * 2 - 1, 1 - pupilY * 2];
-        center = [(rect.left + rect.width * pupilX) / innerWidth * 2 - 1, 1 - (rect.top + rect.height * pupilY) / innerHeight * 2];
-        scale = [rect.width / innerWidth, rect.height / innerHeight];
+        if (!bridge) {
+          const rect = canvas.getBoundingClientRect();
+          const pupilX = .5, pupilY = .53;
+          imageWidth = rect.width; imageHeight = rect.height;
+          fullScreen = true;
+          origin = [pupilX * 2 - 1, 1 - pupilY * 2];
+          center = [(rect.left + rect.width * pupilX) / innerWidth * 2 - 1, 1 - (rect.top + rect.height * pupilY) / innerHeight * 2];
+          scale = [rect.width / innerWidth, rect.height / innerHeight];
+          canvas.classList.add('is-fullscreen'); entry.append(canvas); resize();
+        }
         mouse=[5,5];
-        canvas.classList.add('is-fullscreen'); entry.append(canvas); resize();
         return new Promise(resolve => { unlockState = { at:performance.now(), duration:reduced.matches?1:duration, resolve, done:false }; });
       }
     };
-    draw(performance.now());
+    draw(firstFrame);
     requestAnimationFrame(() => entry.classList.add('is-cloud-ready'));
   }
-  init().catch(() => { entry.dataset.renderer='image-fallback';canvas.remove();if(gl)dispose(); });
+  init().catch(() => { if (!bridge) entry.dataset.renderer='image-fallback';canvas.remove();if(gl)dispose(); });
 })();

@@ -34,6 +34,11 @@
     if (leaving) return;
     leaving = true;
     prefetch();
+    const reference = document.createElement('link');
+    reference.rel = 'preload';
+    reference.as = 'image';
+    reference.href = '/_entry/eye-sculpture-v2.png';
+    document.head.append(reference);
 
     const veil = document.createElement('div');
     veil.className = 'beyond-handoff';

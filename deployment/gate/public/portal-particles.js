@@ -2,7 +2,6 @@
   'use strict';
 
   const handoff = 1270;
-  const arrivalEnd = 1940;
   const scatterEnd = 820;
   const clamp = value => Math.max(0, Math.min(1, value));
   const ease = value => value * value * (3 - 2 * value);
@@ -26,10 +25,10 @@
       const irisRadius = .078 + .082 * random();
       const lid = index % 2 ? .135 : -.158;
       const origin = origins[index];
+      const targetX = iris ? Math.cos(irisAngle) * irisRadius : along * .37;
+      const targetY = iris ? Math.sin(irisAngle) * irisRadius : lid * (1 - along * along) + (random() - .5) * .038;
       return {
-        origin,
-        targetX: iris ? Math.cos(irisAngle) * irisRadius : along * .37,
-        targetY: .021 + (iris ? Math.sin(irisAngle) * irisRadius : lid * (1 - along * along) + (random() - .5) * .038),
+        origin, iris, targetX, targetY,
         spreadX: Math.cos(angle) * radius,
         spreadY: Math.sin(angle) * radius * .83,
         phase: angle,
@@ -50,6 +49,9 @@
     const canvas = field.canvas ?? document.createElement('canvas');
     const context = canvas.getContext('2d');
     if (!context) return null;
+    const entry = arriving ? document.querySelector('#entry') : null;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    const listeners = new AbortController();
     if (arriving) {
       canvas.className = 'portal-particles';
       canvas.setAttribute('aria-hidden', 'true');
@@ -59,12 +61,14 @@
     const particles = makeParticles(field.points ?? [], count);
     const links = field.links ?? [];
     const from = arriving ? handoff : 0;
-    const until = arriving ? arrivalEnd : handoff;
     const started = performance.now();
     const scale = Math.min(devicePixelRatio || 1, 1.5);
     let width, height, frame;
+    let burst, controller, bridge;
+    let errorAt = -Infinity;
+    let gazeX = 0, gazeY = 0, targetX = 0, targetY = 0;
 
-    function draw(time) {
+    function draw(time, now) {
       if (width !== innerWidth || height !== innerHeight) {
         width = innerWidth;
         height = innerHeight;
@@ -81,21 +85,39 @@
       const cx = mix(field.x, .5, .36), cy = mix(field.y, .44, .36);
       const light = ease(clamp((time - 605) / 410));
       const tone = Math.round(50 + light * 174);
-      const silver = 'rgb(' + tone + ' ' + (tone + 4) + ' ' + (tone + 3) + ')';
+      const errorAge = now - errorAt;
+      const error = errorAge < 160 ? ease(clamp(errorAge / 160)) : 1 - ease(clamp((errorAge - 410) / 790));
+      const shake = !reduced.matches && errorAge < 640 ? Math.sin(errorAge * .047) * 15 * (1 - errorAge / 640) : 0;
+      const silver = 'rgb(' + Math.round(mix(tone, 247, error)) + ' ' +
+        Math.round(mix(tone + 4, 55, error)) + ' ' + Math.round(mix(tone + 3, 67, error)) + ')';
       const warm = 1 - ease(clamp((time - 462) / 383));
       const wake = ease(clamp((time - 30) / 300));
-      const fade = 1 - ease(clamp((time - 1490) / 432));
+      const drift = reduced.matches ? 0 : ease(clamp((time - 1510) / 450));
+      const idle = Math.max(0, time - 1510);
+      const orbit = idle * .00016 * drift;
+      const irisCos = Math.cos(orbit), irisSin = Math.sin(orbit);
+      const burstProgress = burst ? clamp((now - burst.at) / burst.duration) : 0;
+      gazeX = mix(gazeX, targetX, .055);
+      gazeY = mix(gazeY, targetY, .055);
 
       for (const particle of particles) {
         let x = Math.max(.13 * width, Math.min(.87 * width, cx * width + particle.spreadX * span));
         let y = Math.max(.14 * height, Math.min(.85 * height, cy * height + particle.spreadY * span));
         let size = particle.size;
-        let alpha = particle.light * fade;
+        let alpha = particle.light;
         let roundness = 1;
         let color = silver;
         particle.attached = false;
 
-        if (time < scatterEnd && particle.origin) {
+        if (burst) {
+          const flight = clamp((burstProgress - particle.delay / 850) / .88);
+          const distance = span * particle.speed * Math.pow(flight, 1.17);
+          const turn = distance * flight * particle.curl * 1.8;
+          x = particle.burstX * width + particle.vx * distance - particle.vy * turn;
+          y = particle.burstY * height + particle.vy * distance + particle.vx * turn;
+          size = particle.burstSize * (1 + .18 * Math.sin(flight * Math.PI));
+          alpha = particle.burstAlpha * (1 - ease(clamp((flight - .15) / .83)));
+        } else if (time < scatterEnd && particle.origin) {
           const origin = particle.origin;
           const release = clamp((time - particle.launch) / (scatterEnd - particle.launch));
           const spread = 1 - Math.pow(1 - release, 1.9);
@@ -113,11 +135,19 @@
           color = 'rgb(' + red + ' ' + green + ' ' + blue + ')';
         } else {
           const gather = ease(clamp((time - scatterEnd - particle.delay) / particle.duration));
-          const dx = width / 2 + particle.targetX * eyeWidth - x;
-          const dy = height * .42 + particle.targetY * eyeWidth - y;
+          let eyeX = particle.targetX, eyeY = particle.targetY;
+          if (particle.iris && drift) {
+            eyeX = particle.targetX * irisCos - particle.targetY * irisSin;
+            eyeY = particle.targetX * irisSin + particle.targetY * irisCos;
+          }
+          const movement = Math.sin(idle * .002 + particle.phase) * drift;
+          const dx = width / 2 + eyeX * eyeWidth - x + drift * gazeX * (particle.iris ? 7 : 2) + shake;
+          const dy = height * .42 + (.021 + eyeY) * eyeWidth - y + drift * gazeY * (particle.iris ? 4 : 1.2) + movement * 1.4;
           const turn = Math.sin(Math.PI * gather) * particle.curl;
           x += dx * gather - dy * turn;
           y += dy * gather + dx * turn;
+          size *= 1 + gather * (.32 + .055 * movement);
+          alpha = Math.min(1, alpha * (1 + gather * .15));
         }
         particle.x = x;
         particle.y = y;
@@ -163,17 +193,75 @@
 
     function stop() {
       cancelAnimationFrame(frame);
+      listeners.abort();
       if (arriving) canvas.remove();
+      if (controller && window.entryEye === controller) window.entryEye = null;
+      if (bridge && window.beyondEyeBridge === bridge) window.beyondEyeBridge = null;
     }
 
     function tick(now) {
-      const time = Math.min(until, from + Math.max(0, now - started));
-      draw(time);
-      if (time < until) frame = requestAnimationFrame(tick);
-      else if (arriving) stop();
+      if (entry && !entry.isConnected) { stop(); return; }
+      const elapsed = from + Math.max(0, now - started);
+      const time = arriving ? elapsed : Math.min(elapsed, handoff);
+      draw(time, now);
+      if (burst && now - burst.at >= burst.duration) {
+        burst.resolve();
+        stop();
+      } else if (arriving || time < handoff) {
+        frame = requestAnimationFrame(tick);
+      }
     }
 
-    draw(from);
+    if (entry) {
+      entry.classList.add('has-brain-eye');
+      entry.dataset.renderer = 'brain-particles';
+      entry.dataset.points = String(count);
+      const options = { passive: true, signal: listeners.signal };
+      window.addEventListener('pointermove', event => {
+        if (burst || reduced.matches || event.pointerType === 'touch') return;
+        targetX = clamp(event.clientX / innerWidth) * 2 - 1;
+        targetY = clamp(event.clientY / innerHeight) * 2 - 1;
+      }, options);
+      document.addEventListener('pointerleave', () => { targetX = 0; targetY = 0; }, options);
+      entry.addEventListener('entry:deny', () => { errorAt = performance.now(); }, options);
+      controller = {
+        ready: true,
+        unlock(duration = 1650) {
+          if (burst) return burst.finished;
+          errorAt = -Infinity;
+          for (const particle of particles) {
+            const heading = Math.atan2(particle.y - height * .44, particle.x - width / 2) + Math.sin(particle.phase) * 1.05;
+            particle.vx = Math.cos(heading);
+            particle.vy = Math.sin(heading);
+            particle.speed = .22 + particle.light * .72;
+            particle.burstX = particle.x / width;
+            particle.burstY = particle.y / height;
+            particle.burstSize = particle.sizeNow;
+            particle.burstAlpha = particle.alpha;
+          }
+          burst = { at: performance.now(), duration: reduced.matches ? 1 : duration };
+          burst.finished = new Promise(resolve => { burst.resolve = resolve; });
+          return burst.finished;
+        }
+      };
+      window.entryEye = controller;
+      bridge = {
+        get active() { return !burst && canvas.isConnected; },
+        capture() {
+          return particles.map(particle => ({
+            x: particle.x / width,
+            y: particle.y / height,
+            size: particle.sizeNow,
+            alpha: particle.alpha,
+            targetX: .5 + particle.targetX,
+            targetY: .5 + (.021 + particle.targetY) * 1.5
+          }));
+        },
+        finish: stop
+      };
+      window.beyondEyeBridge = bridge;
+    }
+    draw(from, started);
     frame = requestAnimationFrame(tick);
     return stop;
   }
@@ -186,9 +274,9 @@
       sessionStorage.removeItem('zhitong-beyond-arrival');
       arrival = JSON.parse(saved);
     } catch {}
-    if (arrival?.at && Date.now() - arrival.at < 15000 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (arrival?.at && Date.now() - arrival.at < 15000 && !matchMedia('(prefers-reduced-motion: reduce)').matches &&
+        fly(arrival.field, true)) {
       document.documentElement.classList.add('from-group-portal');
-      fly(arrival.field, true);
     }
   }
 })();

@@ -11,9 +11,11 @@ html,body{width:100%;height:100%;margin:0;background:#000;overflow:hidden}
 .eye-drift{transform:translate3d(var(--look-x,0px),var(--look-y,0px),0);transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
 .eye{display:block;width:100%;height:100%;position:relative;mask-image:radial-gradient(ellipse 75% 65% at 50% 52%,#000 50%,transparent 95%);transition:filter .7s ease}
 .eye-main,.eye-red{display:block;width:100%;height:100%;object-fit:contain}
+.eye img:not([src]){display:none}
 .eye-main{transition:filter .5s ease,opacity .8s ease}
 .eye-red{position:absolute;inset:0;opacity:0;filter:sepia(1) saturate(8) hue-rotate(320deg) brightness(1.1)}
 #eye-cloud{position:absolute;inset:0;display:block;width:100%;height:100%;opacity:0;transition:opacity .8s ease;pointer-events:none}
+#eye-cloud.portal-eye-cloud{position:fixed;z-index:11;opacity:1;transition:none}
 .entry.is-cloud-ready #eye-cloud{opacity:1}
 .entry.is-cloud-ready .eye-main{opacity:0}
 .entry.is-cloud-ready .eye-red{visibility:hidden}
