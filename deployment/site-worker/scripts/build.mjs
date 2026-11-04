@@ -2,7 +2,7 @@ import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const names = ['entry.html','entry.css','entry.js','eye-cloud.js','eye-sculpture-v2.png'];
+const names = ['entry.html','entry.css','entry.js','eye-cloud.js','eye-sculpture-v2.png','portal-particles.js'];
 const assets = {};
 for (const name of names) assets[name] = (await readFile(resolve(root,'../gate/public',name))).toString('base64');
 for (const name of ['language.css','language.js']) assets[name] = (await readFile(resolve(root,'../../beyond',name))).toString('base64');

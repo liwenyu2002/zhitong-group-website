@@ -1,0 +1,90 @@
+/* The lab page briefly breaks apart before the dark teaser entrance. */
+html.beyond-is-leaving { background: #000; }
+html.beyond-is-leaving :is(#deck, .topnav, #bgBrain, #grain) {
+  animation: beyond-fracture 1.12s steps(1, end) both;
+}
+html.beyond-is-leaving .topnav { animation-delay: -24ms; }
+html.beyond-is-leaving #bgBrain { animation-delay: -12ms; }
+html.beyond-has-brain #bgBrain { visibility: hidden; animation: none; }
+
+.beyond-handoff {
+  position: fixed;
+  z-index: 2147483647;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+.beyond-handoff > i { position: absolute; display: block; }
+.beyond-handoff > .portal-particles { position: absolute; inset: 0; width: 100%; height: 100%; }
+.beyond-handoff__scan {
+  inset: 0;
+  background: repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0, 0, 0, .22) 4px 5px);
+  opacity: 0;
+  animation: beyond-scan 1.12s linear both;
+}
+.beyond-handoff__tear {
+  inset: -2% -3%;
+  background:
+    repeating-linear-gradient(transparent 0 5px, rgba(177, 206, 199, .22) 5px 6px),
+    linear-gradient(90deg, rgba(7, 12, 13, .88), rgba(0, 0, 0, .38) 50%, rgba(4, 9, 10, .72));
+  opacity: 0;
+  animation: beyond-tear 1.12s steps(1, end) both;
+}
+.beyond-handoff__line {
+  inset: 50% 0 auto;
+  height: 1px;
+  background: rgba(225, 239, 235, .55);
+  box-shadow: 0 0 15px rgba(202, 226, 221, .2);
+  opacity: 0;
+  transform: scaleX(.4);
+  animation: beyond-line 1.12s ease-out both;
+}
+.beyond-handoff__black {
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  animation: beyond-black 1.12s linear both;
+}
+
+@keyframes beyond-fracture {
+  0%, 16%, 22%, 38%, 43%, 56%, 62%, 100% { translate: 0 0; }
+  17% { translate: -8px 0; }
+  20% { translate: 3px 0; }
+  39% { translate: 14px 1px; }
+  41% { translate: -6px -1px; }
+  57% { translate: -17px 0; }
+  59% { translate: 7px 0; }
+}
+@keyframes beyond-scan {
+  0%, 12% { opacity: 0; }
+  18% { opacity: .15; }
+  35% { opacity: .06; }
+  60% { opacity: .18; }
+  82%, 100% { opacity: 0; }
+}
+@keyframes beyond-tear {
+  0%, 17%, 23%, 39%, 44%, 57%, 63%, 100% { opacity: 0; clip-path: inset(0); }
+  18% { opacity: .45; clip-path: inset(18% 0 79%); }
+  20% { opacity: .35; clip-path: inset(71% 0 26%); }
+  40% { opacity: .55; clip-path: inset(42% 0 51%); }
+  42% { opacity: .3; clip-path: inset(11% 0 87%); }
+  58% { opacity: .55; clip-path: inset(62% 0 30%); }
+  60% { opacity: .4; clip-path: inset(29% 0 67%); }
+}
+@keyframes beyond-line {
+  0%, 64% { opacity: 0; transform: scaleX(.35); }
+  70% { opacity: .45; transform: scaleX(1); }
+  78%, 100% { opacity: 0; transform: scaleX(1); }
+}
+@keyframes beyond-black {
+  0%, 39% { opacity: 0; }
+  53% { opacity: .13; }
+  68% { opacity: .72; }
+  79%, 100% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.beyond-is-leaving :is(#deck, .topnav, #bgBrain, #grain),
+  .beyond-handoff > i { animation: none; }
+}

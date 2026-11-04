@@ -22,7 +22,7 @@ for name in ('css', 'js', 'img'):
 entry = root / 'deployment/gate/public'
 public_entry = output / '_entry'
 public_entry.mkdir()
-for name in ('entry.css', 'entry.js', 'eye-cloud.js', 'eye-sculpture-v2.png'):
+for name in ('entry.css', 'entry.js', 'eye-cloud.js', 'eye-sculpture-v2.png', 'portal-particles.js'):
     shutil.copy2(entry / name, public_entry / name)
 for name in ('language.css', 'language.js'):
     shutil.copy2(root / 'beyond' / name, public_entry / name)

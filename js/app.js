@@ -464,6 +464,21 @@
     let bgTick = 0;
     const bgDbg = {};
     window.__brainDebug = () => ({ ...bgDbg });
+    let brainFrame;
+    window.labBrainSnapshot = () => {
+      if (!brainFrame) return [];
+      const { cx, cy, rot, w, h, reveal } = brainFrame;
+      const cos = Math.cos(rot), sin = Math.sin(rot);
+      const snapshot = [];
+      for (const dot of dots) {
+        if (dot.rank > reveal) continue;
+        const x = (cx + dot.sx * cos - dot.sy * sin) / w;
+        const y = (cy + dot.sx * sin + dot.sy * cos) / h;
+        if (x < 0 || x > 1 || y < 0 || y > 1) continue;
+        snapshot.push({ x, y, size: dot.paintSize, alpha: dot.paintAlpha, light: dot.lit });
+      }
+      return snapshot;
+    };
     // ── 神经粒子流：大脑上对应位置的点阵被四台设备吸引流走 ──
     const flowDevs = ['.desktop', '.phone', '.watch', '.laptop'].map(s => document.querySelector(s));
     const flows = flowDevs.filter(Boolean).map(el => ({
@@ -499,6 +514,7 @@
     const mq = { el: document.querySelector('.pi-toprow .marquee-plate'), hasA: false, ax: 0, ay: 0, lax: 0, lay: 0, phase: Math.random() * 6.28, face: [], parts: makeParts(7) };
     const rq = { hasA: false, ax: 0, ay: 0, sax: null, say: null, lax: 0, lay: 0, phase: Math.random() * 6.28, face: [], parts: makeParts(7) };
     return function draw(dt) {
+      if (document.documentElement.classList.contains('beyond-has-brain')) return;
       if ((++bgTick & 1) !== 0) return;  // 隔帧渲染，背景层省一半开销
       const dpr = Math.min(devicePixelRatio || 1, 1.5);
       const w = innerWidth, h = innerHeight;
@@ -688,10 +704,13 @@
           : base * (0.5 + d.sz * 0.4) * (0.6 + 0.4 * Math.sin(t * 0.9 + d.tw));
         a = Math.min(0.92, Math.max(0.02, a * (0.85 + lit * 0.55) * (1 - ao * 0.5) * (0.85 + inf * 0.4)));
         const size = Math.max(1.2, sc * 0.5 * d.sz * (0.8 + inf * 1.6));
+        d.paintSize = size;
+        d.paintAlpha = a;
         const r = 31 + 175 * lit, g2 = 30 + 92 * lit, b2 = 27 + 45 * lit;
         ctx.fillStyle = 'rgba(' + r.toFixed(0) + ',' + g2.toFixed(0) + ',' + b2.toFixed(0) + ',' + a.toFixed(3) + ')';
         ctx.fillRect(d.sx - size / 2, d.sy - size / 2, size, size);
       }
+      brainFrame = { cx, cy, rot, w, h, reveal };
 
       // 3.5) 凸起顶点柔光
       const apexX = bcx * sc - RW * sc / 2, apexY = bcy * sc - RH * sc / 2;
