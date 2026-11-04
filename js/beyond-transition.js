@@ -8,7 +8,13 @@
   let leaving = false;
   let timer;
   let prefetched = false;
-  let stopParticles;
+  let flight, arrival;
+
+  function rememberArrival() {
+    if (!arrival) return;
+    if (arrival.field) arrival.field.time = flight.time;
+    try { sessionStorage.setItem('zhitong-beyond-arrival', JSON.stringify(arrival)); } catch {}
+  }
 
   function prefetch() {
     if (prefetched) return;
@@ -54,26 +60,29 @@
     const brain = window.labBrainSnapshot?.();
     if (brain?.points.length && portal) {
       document.documentElement.classList.add('beyond-has-brain');
-      stopParticles = portal.fly(brain);
+      flight = portal.fly(brain);
     }
 
     timer = window.setTimeout(() => {
-      try {
-        const field = stopParticles ? { count: brain.points.length, x: brain.x, y: brain.y } : null;
-        sessionStorage.setItem('zhitong-beyond-arrival', JSON.stringify({ at: Date.now(), field }));
-      } catch {}
+      const field = flight ? { points: brain.points, x: brain.x, y: brain.y } : null;
+      arrival = { at: Date.now(), field };
+      rememberArrival();
       location.assign(destination.href);
     }, portal?.handoff ?? 1270);
   });
+
+  // Use the last drawn frame even if navigation takes a moment to commit.
+  window.addEventListener('pagehide', rememberArrival);
 
   // A restored page must not keep the black transition over its content.
   window.addEventListener('pageshow', event => {
     if (!event.persisted || !leaving) return;
     clearTimeout(timer);
-    stopParticles?.();
+    flight?.stop();
     document.documentElement.classList.remove('beyond-is-leaving', 'beyond-has-brain');
     document.querySelector('.beyond-handoff')?.remove();
     document.querySelector('.beyond-handoff__black')?.remove();
+    flight = arrival = null;
     leaving = false;
   });
 })();

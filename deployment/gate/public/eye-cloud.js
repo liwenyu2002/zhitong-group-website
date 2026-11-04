@@ -4,6 +4,7 @@
   const bridge = window.beyondEyeBridge;
   const host = document.querySelector('.eye');
   const source = document.querySelector('.eye-main');
+  const arrivalDuration = 940;
   const reference = bridge ? new Image() : source;
   if (source.dataset.src) reference.src = source.dataset.src;
   if (!bridge) {
@@ -21,6 +22,7 @@
     attribute vec4 aOrbit;
     attribute vec4 aFlight;
     attribute vec2 aFamily;
+    attribute vec2 aVelocity;
     uniform sampler2D uReference;
     uniform float uTime;
     uniform float uMotion;
@@ -36,6 +38,10 @@
     uniform vec2 uCenter;
     uniform vec2 uOrigin;
     varying float vLight;
+    vec2 glide(vec2 from, vec2 tangent, vec2 to, float t) {
+      float left = 1.0 - t;
+      return mix(from, to, t*t*(3.0 - 2.0*t)) + tangent * t * left * left;
+    }
     void main() {
       const float TAU = 6.2831853;
       float radius = aOrbit.x;
@@ -109,17 +115,18 @@
       // Correct the density of elliptical lanes to keep the reference light.
       vLight = (light + .003 * smoothstep(.003,.025,light)) * uGain * areaWeight * 1.447 * energy;
       if (uArrival < 1.0) {
-        float travel = smoothstep(0.0, .96, uArrival);
         if (aFlight.z >= 0.0) {
-          position = mix(aFlight.xy, position, travel);
+          float travel = smoothstep(0.0, 1.0, uArrival);
+          position = glide(aFlight.xy, aVelocity, position, uArrival);
           pointSize = mix(aFlight.w, pointSize, travel);
           vLight = mix(aFlight.z, vLight, travel);
         } else {
-          float birth = .035 + seed * .62;
-          float open = smoothstep(birth, min(1.0, birth + .36), uArrival);
-          vec2 parent = mix(aFlight.xy, aFamily * uScale + uCenter, travel);
-          position = mix(parent, position, open);
-          vLight *= smoothstep(birth, birth + .22, uArrival) * sqrt(open);
+          float birth = .025 + seed * .55;
+          float open = smoothstep(birth, birth + .40, uArrival);
+          vec2 familyEnd = aFamily * uScale + uCenter;
+          vec2 parent = glide(aFlight.xy, aVelocity, familyEnd, uArrival);
+          position = parent + (position - familyEnd) * open;
+          vLight *= smoothstep(birth, birth + .31, uArrival) * sqrt(open);
         }
       }
       gl_Position = vec4(position, 0.0, 1.0);
@@ -230,7 +237,7 @@
     gl.uniform1f(uniforms.uMotion, motionAmount);
     gl.uniform1f(uniforms.uDpr, dpr);
     gl.uniform1f(uniforms.uBurst, burst);
-    gl.uniform1f(uniforms.uArrival, Math.min(1, (now - arrivalStarted) / 940));
+    gl.uniform1f(uniforms.uArrival, Math.min(1, (now - arrivalStarted) / arrivalDuration));
     gl.uniform1f(uniforms.uGain, gain);
     gl.uniform1f(uniforms.uRed, red);
     gl.uniform2f(uniforms.uSize, width, height);
@@ -260,35 +267,57 @@
       used[best] = 1;
       return { point, orbit: best, x: projected[best * 2], y: projected[best * 2 + 1] };
     });
-    const columns = 32, rows = 24;
-    const lookup = Array.from({ length: columns * rows }, (_, cell) => {
-      const x = (cell % columns + .5) / columns, y = (Math.floor(cell / columns) + .5) / rows;
-      let nearest = 0, distance = Infinity;
+    function pack(family, original, into, offset) {
+      const { point, x, y } = family;
+      into[offset] = point.x * 2 - 1;
+      into[offset + 1] = 1 - point.y * 2;
+      into[offset + 2] = original ? point.alpha * .92 : -1;
+      into[offset + 3] = point.size;
+      into[offset + 4] = x * 2 - 1;
+      into[offset + 5] = 1 - y * 2;
+      into[offset + 6] = point.velocityX * 2 * arrivalDuration;
+      into[offset + 7] = -point.velocityY * 2 * arrivalDuration;
+    }
+
+    // Interpolate adjacent families so the growing dust has a continuous
+    // velocity field, even where two clusters are moving in different arcs.
+    const columns = 28, rows = 22, stride = columns + 1;
+    const field = new Float32Array(stride * (rows + 1) * 8);
+    for (let cell = 0; cell < field.length / 8; cell++) {
+      const x = (cell % stride) / columns, y = Math.floor(cell / stride) / rows;
+      let nearest = families[0], distance = Infinity;
       for (let i = 0; i < families.length; i++) {
         const dx = families[i].x - x, dy = families[i].y - y;
         const score = dx * dx * 2.25 + dy * dy;
-        if (score < distance) { nearest = i; distance = score; }
+        if (score < distance) { nearest = families[i]; distance = score; }
       }
-      return nearest;
-    });
-    const flight = new Float32Array(orbits.length / 4 * 6);
+      pack(nearest, false, field, cell * 8);
+    }
+    const flight = new Float32Array(orbits.length / 4 * 8);
     let remaining = 0;
     for (let index = 0; index < orbits.length / 4; index++) {
       const original = index < families.length;
       while (used[remaining]) remaining++;
       const orbitIndex = original ? families[index].orbit : remaining++;
-      const column = Math.max(0, Math.min(columns - 1, Math.floor(projected[orbitIndex * 2] * columns)));
-      const row = Math.max(0, Math.min(rows - 1, Math.floor(projected[orbitIndex * 2 + 1] * rows)));
-      const family = families[original ? index : lookup[row * columns + column]];
       const input = orbitIndex * 4, output = index * 4;
       for (let channel = 0; channel < 4; channel++) orbits[output + channel] = originals[input + channel];
-      const { point, x, y } = family, offset = index * 6;
-      flight[offset] = point.x * 2 - 1;
-      flight[offset + 1] = 1 - point.y * 2;
-      flight[offset + 2] = original ? point.alpha * .92 : -1;
-      flight[offset + 3] = point.size;
-      flight[offset + 4] = x * 2 - 1;
-      flight[offset + 5] = 1 - y * 2;
+      const offset = index * 8;
+      if (original) {
+        pack(families[index], true, flight, offset);
+        continue;
+      }
+      const gridX = Math.max(0, Math.min(columns, projected[orbitIndex * 2] * columns));
+      const gridY = Math.max(0, Math.min(rows, projected[orbitIndex * 2 + 1] * rows));
+      const column = Math.min(columns - 1, Math.floor(gridX));
+      const row = Math.min(rows - 1, Math.floor(gridY));
+      const u = gridX - column, v = gridY - row;
+      const top = (row * stride + column) * 8, bottom = top + stride * 8;
+      for (let channel = 0; channel < 8; channel++) {
+        const upper = field[top + channel] * (1 - u) + field[top + 8 + channel] * u;
+        const lower = field[bottom + channel] * (1 - u) + field[bottom + 8 + channel] * u;
+        flight[offset + channel] = upper * (1 - v) + lower * v;
+      }
+      flight[offset + 2] = -1;
     }
     return flight;
   }
@@ -360,8 +389,10 @@
       gl.bindBuffer(gl.ARRAY_BUFFER, flightBuffer);
       gl.bufferData(gl.ARRAY_BUFFER, flight, gl.STATIC_DRAW);
       const from = gl.getAttribLocation(program, 'aFlight'), family = gl.getAttribLocation(program, 'aFamily');
-      gl.enableVertexAttribArray(from); gl.vertexAttribPointer(from, 4, gl.FLOAT, false, 24, 0);
-      gl.enableVertexAttribArray(family); gl.vertexAttribPointer(family, 2, gl.FLOAT, false, 24, 16);
+      const velocity = gl.getAttribLocation(program, 'aVelocity');
+      gl.enableVertexAttribArray(from); gl.vertexAttribPointer(from, 4, gl.FLOAT, false, 32, 0);
+      gl.enableVertexAttribArray(family); gl.vertexAttribPointer(family, 2, gl.FLOAT, false, 32, 16);
+      gl.enableVertexAttribArray(velocity); gl.vertexAttribPointer(velocity, 2, gl.FLOAT, false, 32, 24);
       fullScreen = true;
       canvas.classList.add('portal-eye-cloud');
       document.body.append(canvas);
