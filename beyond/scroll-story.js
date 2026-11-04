@@ -65,6 +65,7 @@
     if (nextVisible !== visible) {
       visible = nextVisible;
       story.classList.toggle('phone-visible', visible);
+      document.body.classList.toggle('story-phone-visible', visible);
       holder.inert = !visible;
       holder.setAttribute('aria-hidden', String(!visible));
       post('visibility', { visible });

@@ -24,6 +24,8 @@ public_entry = output / '_entry'
 public_entry.mkdir()
 for name in ('entry.css', 'entry.js', 'eye-cloud.js', 'eye-sculpture-v2.png'):
     shutil.copy2(entry / name, public_entry / name)
+for name in ('language.css', 'language.js'):
+    shutil.copy2(root / 'beyond' / name, public_entry / name)
 
 source = (root / 'deployment/site-worker/worker/index.js').read_text()
 placeholder = 'const ENTRY_ASSETS = /* ENTRY_ASSETS */ null;'

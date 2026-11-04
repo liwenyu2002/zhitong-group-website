@@ -5,6 +5,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const names = ['entry.html','entry.css','entry.js','eye-cloud.js','eye-sculpture-v2.png'];
 const assets = {};
 for (const name of names) assets[name] = (await readFile(resolve(root,'../gate/public',name))).toString('base64');
+for (const name of ['language.css','language.js']) assets[name] = (await readFile(resolve(root,'../../beyond',name))).toString('base64');
 const source = await readFile(resolve(root,'worker/index.js'),'utf8');
 if (!source.includes('/* ENTRY_ASSETS */ null')) throw new Error('Missing entry asset insertion point');
 const bundled = source.replace('/* ENTRY_ASSETS */ null', JSON.stringify(assets));

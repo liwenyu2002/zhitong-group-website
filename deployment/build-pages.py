@@ -24,6 +24,8 @@ shutil.copytree(root / 'beyond', destination / 'beyond')
 entry = root / 'deployment/gate/public'
 shutil.copytree(entry, destination / '_entry')
 shutil.copy2(root / 'deployment/gate/static-auth.js', destination / '_entry/static-auth.js')
+for name in ('language.css', 'language.js'):
+    shutil.copy2(root / 'beyond' / name, destination / '_entry' / name)
 gate = (entry / 'entry.html').read_text()
 script = '  <script src="/_entry/entry.js?v=flow5" defer></script>'
 if script not in gate:

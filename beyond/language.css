@@ -1,0 +1,60 @@
+/* A small, quiet control that stays available as the story moves. */
+.language-switch {
+  position: fixed;
+  top: clamp(20px, 3.4vw, 44px);
+  right: clamp(20px, 5.5vw, 112px);
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  min-width: 76px;
+  min-height: 44px;
+  padding: 8px 5px;
+  border: 0;
+  background: transparent;
+  color: #747474;
+  cursor: pointer;
+  font: 400 11px/1 -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", sans-serif;
+  letter-spacing: .08em;
+  -webkit-tap-highlight-color: transparent;
+}
+.language-switch .language-zh,
+.language-switch .language-en { transition: color .45s ease, opacity .45s ease; }
+.language-switch .language-zh { color: #e1e1e1; }
+html[lang="en"] .language-switch .language-zh { color: #747474; }
+html[lang="en"] .language-switch .language-en { color: #e1e1e1; }
+.language-switch .language-star {
+  width: 3px;
+  height: 3px;
+  flex: none;
+  border-radius: 50%;
+  background: #898989;
+  box-shadow: 0 0 7px #ffffff55;
+  transition: background .45s ease, box-shadow .45s ease;
+}
+.language-switch:hover .language-zh,
+.language-switch:hover .language-en { color: #f2f2f2; }
+.language-switch:hover .language-star { background: #ddd; box-shadow: 0 0 10px #ffffff88; }
+.language-switch:focus-visible { outline: 1px solid #aaa; outline-offset: 3px; }
+html[lang="en"] :is(.hero h1, .afterglow-copy h2, .section-copy h2, .paired-copy h2, figcaption h3, .closing-copy h2) {
+  font-family: "Teaser Kai", "Georgia", "Times New Roman", serif;
+  letter-spacing: .015em;
+  line-height: 1.28;
+}
+html[lang="en"] .hero h1 { font-size: clamp(46px, 6vw, 96px); }
+html[lang="en"] .closing-copy h2 { font-size: clamp(64px, 8vw, 120px); }
+@media (max-width: 700px) {
+  .language-switch { top: 14px; right: 18px; transition: transform .7s cubic-bezier(.2,.7,.2,1); }
+  body.story-phone-visible .language-switch { transform: translateY(calc(100vh - 88px - env(safe-area-inset-bottom, 0px))); }
+  @supports (height: 100svh) {
+    body.story-phone-visible .language-switch { transform: translateY(calc(100svh - 88px - env(safe-area-inset-bottom, 0px))); }
+  }
+}
+@media (max-width: 600px) {
+  html[lang="en"] .hero h1 { font-size: clamp(40px, 11vw, 58px); }
+  html[lang="en"] .closing-copy h2 { font-size: 54px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .language-switch, .language-switch * { transition: none; }
+}

@@ -4275,7 +4275,7 @@ function nxRenderMemory(){
   for(const view of ['people','records']){const active=view===(isRecords?'records':'people'),button=nxEl('nx-memory-tab-'+view);button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1;nxEl('nx-'+view+'-view').hidden=!active}
   nxEl('nx-graph-filters').hidden=isRecords;
   document.querySelectorAll('[data-person-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.personFilter===nxMemory.filter)));
-  const records=nxMemory.events.filter(e=>!search||[e.title,e.summary,e.quote,nxEventNames(e),e.tag,e.source].join(' ').toLocaleLowerCase().includes(search));
+  const records=nxMemory.events.filter(e=>{if(!search)return true;const fields=[e.title,e.summary,e.quote,nxEventNames(e),e.tag,e.source].filter(Boolean),english=fields.map(value=>window.PmsgLanguage?.english(value)||value);return [...fields,...english].join(' ').toLocaleLowerCase().includes(search)});
   nxEl('nx-records-heading').textContent=search?'搜索结果':'全部记录';nxEl('nx-records-count').textContent=records.length+' 条';
   nxEl('nx-memory-records').innerHTML=records.length?records.map(nxEventRow).join(''):`<p class="nx-empty-copy">${search?'没有找到相关记录，试试其他关键词。':'还没有记忆记录。'}</p>`;
   if(isRecords)return;
@@ -4626,7 +4626,8 @@ addEventListener('load',()=>setTimeout(()=>{
   const healthLink={title:'NHS · 日常减压建议',url:'https://www.nhs.uk/every-mind-matters/lifes-challenges/work-related-stress/'};
   window.eyeXAgentTransport=async({message,history,contextRecordIds})=>{
     await new Promise(resolve=>setTimeout(resolve,650));
-    const q=message.trim();
+    const raw=message.trim();
+    const q=window.PmsgLanguage?.language==='en'?raw.replace(/\b(xiaoman|lin ke|a yuan|mom|mother|friday|saturday|weekend|keys?|hike|hiking|route|sketches?|tomorrow|today|tired|fatigue|anxiety|anxious|stress|sleep|rest|health)\b/gi,word=>({xiaoman:'小满','lin ke':'林可','a yuan':'阿远',mom:'妈妈',mother:'妈妈',friday:'周五',saturday:'周六',weekend:'周末',key:'钥匙',keys:'钥匙',hike:'徒步',hiking:'徒步',route:'路线',sketch:'草图',sketches:'草图',tomorrow:'明天',today:'今天',tired:'累',fatigue:'疲劳',anxiety:'焦虑',anxious:'焦虑',stress:'压力',sleep:'睡眠',rest:'休息',health:'健康'}[word.toLowerCase()]||word)):raw;
     if(/焦虑|压力|疲|累|健康|放松|睡眠|休息/.test(q)){
       if(/药|诊断|焦虑症|治疗|抑郁/.test(q))return {text:'仅凭这些状态指数无法判断是否患有疾病，也不能据此决定用药。如果不适持续或影响日常生活，建议咨询医生。\n\n如果你愿意，可以先说说最近具体有哪些感受、持续了多久。'};
       return {text:'先暂停手上的事，给自己留一小段休息时间。如果感觉紧绷，可以坐得舒服一点，慢慢呼吸，或轻轻活动一下。\n\n这些是一般的日常建议。你是今天比较累，还是最近一直这样？',links:[healthLink]};
@@ -4652,5 +4653,5 @@ addEventListener('load',()=>setTimeout(()=>{
   if(new URLSearchParams(location.search).get('section')==='signals')requestAnimationFrame(()=>{const card=nxEl('nx-signal-panel').closest('.nx-signals');nxScroll.scrollTop+=card.getBoundingClientRect().top-nxScroll.getBoundingClientRect().top-10});
   window.__memorySampleReady=true;
 },150));
-</script><script src="story-embed.js?v=20261103-app1"></script></body>
+</script><script src="story-embed.js?v=20261103-app1"></script><script src="../language.js?v=20261104-1"></script></body>
 </html>
